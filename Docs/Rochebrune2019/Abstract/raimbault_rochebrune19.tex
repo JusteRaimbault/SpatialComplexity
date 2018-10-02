@@ -1,0 +1,140 @@
+\documentclass[11pt]{article}
+
+% general packages without options
+\usepackage{amsmath,amssymb,bbm}
+% graphics
+\usepackage{graphicx}
+% text formatting
+\usepackage[document]{ragged2e}
+\usepackage{pagecolor,color}
+
+\newcommand{\noun}[1]{\textsc{#1}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% geometry
+\usepackage[margin=1.8cm]{geometry}
+
+\usepackage{multicol}
+\usepackage{setspace}
+
+
+
+\usepackage{natbib}
+\setlength{\bibsep}{0.0pt}
+
+\usepackage[french]{babel}
+
+% layout : use fancyhdr package
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+
+% variable to include comments or not in the compilation ; set to 1 to include
+\def \draft {1}
+
+
+% writing utilities
+
+% comments and responses
+%  -> use this comment to ask questions on what other wrote/answer questions with optional arguments (up to 4 answers)
+\usepackage{xparse}
+\usepackage{ifthen}
+\DeclareDocumentCommand{\comment}{m o o o o}
+{\ifthenelse{\draft=1}{
+    \textcolor{red}{\textbf{C : }#1}
+    \IfValueT{#2}{\textcolor{blue}{\textbf{A1 : }#2}}
+    \IfValueT{#3}{\textcolor{ForestGreen}{\textbf{A2 : }#3}}
+    \IfValueT{#4}{\textcolor{red!50!blue}{\textbf{A3 : }#4}}
+    \IfValueT{#5}{\textcolor{Aquamarine}{\textbf{A4 : }#5}}
+ }{}
+}
+
+% todo
+\newcommand{\todo}[1]{
+\ifthenelse{\draft=1}{\textcolor{red!50!blue}{\textbf{TODO : \textit{#1}}}}{}
+}
+
+
+\makeatletter
+
+
+\makeatother
+
+
+\begin{document}
+
+
+
+
+
+
+
+\title{\vspace{-1.5cm}Espace et complexités des systèmes territoriaux
+\\\medskip
+\textit{Rochebrune 2019\\
+Proposition de communication
+}
+}
+\author{\noun{Juste Raimbault}$^{1,2}$
+\\
+$^1$ UPS CNRS 3611 ISC-PIF\\
+$^2$ UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
+}
+\date{}
+
+\maketitle
+
+\justify
+
+\pagenumbering{gobble}
+
+
+\textbf{Keywords : }\textit{Complexités; Systèmes territoriaux; Morphogenèse urbaine; Co-évolution}
+
+\medskip
+
+Les systèmes territoriaux, qui peuvent être compris comme des structures socio-spatiales auto-organisées, sont une illustration typique de systèmes complexes étudiés sous de nombreux angles incluant plus ou moins l'aspect spatial de ces systèmes. Cette contribution vise à illustrer une approche de ceux-ci par la géographie urbaine, et dans quelle mesure leur complexité est intimement liée à leur caractère spatial. Notre appréhension des systèmes territoriaux se place plus particulièrement dans la lignée de la théorie évolutive des villes~\citep{pumain1997pour} qui comprend les systèmes urbains comme des systèmes multi-niveaux, dans lesquels la co-évolution des multiples composants et agents détermine la dynamique de ceux-ci~\citep{raimbault2018caracterisation}. Le concept de complexité correspond à de diverses approches et définitions \citep{chu2008criteria,deffuant2015visions}, et nous tâchons d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux.
+
+\paragraph{Complexité ontologique}
+
+Une première entrée théorique permet une entrée sur ce que nous appelons \emph{complexité ontologique}, qui a été proposée par \cite{pumain2003approche} comme la largeur des points de vue disciplinaires nécessaires pour appréhender un même objet. La multidimensionalité des systèmes territoriaux reste un enjeu principal pour leur compréhension, comme l'illustre \cite{perez2016agent} dans le cas des systèmes multi-agents. Nous reprenons l'exemple de \citep{raimbault2017invisible} comme preuve-de-concept de la diversité des approches possibles dans le cas des relations entre réseaux et territoires, et suggérons des pistes de réflexion quant au rôle de l'espace dans cette complexité, comme les processus évolutifs de diversification ou de spécialisation liés aux niches spatiales.
+
+\paragraph{Complexité dynamique}
+
+La compréhension des systèmes complexes comme systèmes dynamiques aux attracteurs plus ou moins chaotiques a été largement développée en géographie \citep{dauphine1995chaos}. Nous utilisons ici un modèle de morphogenèse urbaine introduit par \cite{raimbault2018calibration} pour illustrer les propriétés de non-ergodicité et de dépendance au chemin des systèmes territoriaux~\citep{pumain2012urban}. En particulier, nous montrons la forte sensibilité des formes urbaines finales simulées aux perturbations spatiales, et plus généralement la dépendance au chemin des trajectoires pour les indicateurs morphologiques agrégés.
+
+\paragraph{Complexité et co-évolution}
+
+L'intrication forte des éléments présents au sein de ce qui peut être compris comme niches territoriales, au sens des niches écologiques de \cite{holland2012signals}, est une expression d'une co-évolution et donc d'une complexité au sein de ces niches. \cite{raimbault2018modeling} montre l'existence empirique de ces niches spatiales dans le cas du système de villes français sur le temps long, ainsi que leur émergence au sein d'un modèle de co-évolution entre villes et réseaux de transport à l'échelle macroscopique. Nous explorons alors ici par des expériences de simulation le lien entre non-stationnarité spatiale, qui est également un marqueur de complexité spatiale, et émergence de niches au sein d'un modèle de morphogenèse hybride couplant développement urbain et réseau, introduit par~\cite{raimbault2014hybrid}.
+
+\paragraph{Complexité et émergence}
+
+Notre dernière entrée s'intéresse à la complexité en tant qu'émergence faible de structures et autonomie des niveaux supérieurs~\citep{bedau2002downward}, de manière théorique. Nous rappelons le caractère intrinsèquement multi-échelle des systèmes territoriaux et la nécessité actuelle de production de modèles spatiaux l'intégrant effectivement~\citep{rozenblat2018conclusion}. La difficulté d'endogénéisation de niveau supérieurs autonomes peut par exemple être illustrée par~\cite{lenechet:halshs-01272236} qui propose un modèle de co-évolution entre transport et usage du sol à l'échelle métropolitaine intégrant une structure de gouvernance endogène pour le réseau de transport.
+
+
+%\paragraph{Perspectives}
+
+\bigskip
+
+Diverses approches de la complexité que nous n'avons pu aborder sont suggérées en perspective, comme le lien entre complexité computationnelle et caractère de grande déviation des configurations territoriales (impossibilité empirique en probabilité de les obtenir en force brute), ou le lien entre complexité informationnelle et diffusion de l'innovation dans les systèmes territoriaux \citep{favaro2011gibrat}. Nous suggérons finalement, suivant \cite{raimbault2017complexity}, que les systèmes territoriaux sont nécessairement au croisement de multiples complexités, et ajoutons, d'après les divers exemples développés ici, que leur caractère spatial prend une place importante dans l'émergence de celles-ci.
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%% Biblio
+%%%%%%%%%%%%%%%%%%%%
+%\tiny
+
+%\begin{multicols}{2}
+
+%\setstretch{0.3}
+%\setlength{\parskip}{-0.4em}
+
+
+\bibliographystyle{apalike}
+\bibliography{/Users/juste/ComplexSystems/CityNetwork/Biblio/Bibtex/CityNetwork,biblio}
+%\end{multicols}
+
+
+
+\end{document}
