@@ -1,0 +1,389 @@
+
+
+
+to setup
+  setup-world
+  setup-centres  
+  setup-network
+  setup-center-activities
+  setup-patches
+  setup-reporters
+end
+
+
+
+to setup-world
+  if headless? = 0 [clear-all set values-table? false]
+  if fixed-seed? [random-seed seed]
+  reset-ticks ; -> should be at the end of setup 
+  output-print (word "Setting up : w_dens = " density-coefficient " ; w_roads = " distance-to-roads-coefficient " ; w_center = " distance-to-center-coefficient)
+  set-patch-size worldwidth / 7
+  resize-world (- floor (worldwidth / 2)) floor (worldwidth / 2) (- floor (worldwidth / 2)) floor (worldwidth / 2)
+  set dmax sqrt ((world-width ^ 2) + (world-height ^ 2))
+  set current-time-spent 0
+  
+  ;;profiler for debug purposes
+  set tracker-time 0
+  
+  ;;check some condition on vars
+  if activities-number > centers-number [set activities-number centers-number]
+  
+  ;;other globals
+  if config-comparison? [set pareto-points []]
+  
+  ;; config name, for exports
+  set config-name (word "wdens" density-coefficient "_wroad" distance-to-roads-coefficient "_wcenter" distance-to-center-coefficient 
+    "wactiv" distance-to-activities-coefficient "_droad" distance-road-needed "_neigh" neighborhood-radius "_growth" built-cells-per-tick 
+    "_centers" centers-number "_activities" activities-number "_activnorm" activities-norma "_seed" seed)
+  
+end
+
+
+
+;;
+;
+to setup-patches
+  
+    ;let centers (n-of 6 patches)
+    let centers patches with [count centres-here > 0]
+  
+    if patch-param-mode = "linear-gradient" or patch-param-mode = "closest-center" [
+       ; random "centers" with values ; take the weighted average 
+       ask centers [
+         ;random-patch-params
+         extreme-patch-params
+         ;sprout 1
+       ]
+    ]
+    set centers to-list centers
+  
+    ask patches [
+      set pcolor white
+      set constructed? false
+      set constructible? true
+      set value 0
+      set rent 0
+    
+    
+      if patch-param-mode = "random-local" [
+        ;random-patch-params
+        extreme-patch-params
+      ]
+    
+      if patch-param-mode = "uniform" [
+        set p-distance-to-roads-coefficient distance-to-roads-coefficient
+        set p-distance-to-center-coefficient distance-to-center-coefficient
+        set p-density-coefficient density-coefficient
+        set p-distance-to-activities-coefficient distance-to-activities-coefficient
+      ]
+      
+      if patch-param-mode = "linear-gradient" [
+        ; random "centers" with values ; take the weighted average 
+        if not member? self centers [
+          ; w_i = d_i / sum(d_i)
+          let dists map [p -> distance p] centers
+          let w map [d -> d / sum dists] dists
+          set pw w set pdists dists
+        set p-distance-to-roads-coefficient scalar-product (map [p -> [p-distance-to-roads-coefficient] of p] centers) w
+        set p-distance-to-center-coefficient scalar-product (map [p -> [p-distance-to-center-coefficient] of p] centers) w
+        set p-density-coefficient scalar-product (map [p -> [p-density-coefficient] of p] centers) w
+        set p-distance-to-activities-coefficient scalar-product (map [p -> [p-distance-to-activities-coefficient] of p] centers) w
+        ]
+      ]
+   
+      if patch-param-mode = "closest-center" [
+        if not member? self centers [
+          let ptarget one-of (patches with [count centres-here > 0]) with-min [distance myself]
+          copy-params ptarget
+        ]
+      ] 
+    
+    ]
+    
+    ;;deal with already existing nw and centers
+    ask patches with [count centres-here > 0] [set constructible? false]
+    ;;could count some twice, however, isolated centers ? NO ! previous line ~
+    ask paths [foreach footprint [? -> ask ? [set constructible? false]]]
+    
+    update-patches-values
+    
+    display-CA
+    
+end
+
+to random-patch-params
+   set p-distance-to-roads-coefficient random-float 1
+   set p-distance-to-center-coefficient random-float 1
+   set p-density-coefficient random-float 1
+   set p-distance-to-activities-coefficient random-float 1
+end
+
+to extreme-patch-params
+   set p-distance-to-roads-coefficient random 2
+   set p-distance-to-center-coefficient random 2
+   set p-density-coefficient random 2
+   set p-distance-to-activities-coefficient random 2
+   if p-distance-to-roads-coefficient + p-distance-to-center-coefficient + p-density-coefficient + p-distance-to-activities-coefficient = 0 [
+    let r random 4 if r = 0 [set p-distance-to-roads-coefficient 1] if r = 1 [set p-distance-to-center-coefficient 1] if r = 2 [set p-density-coefficient 1] if r = 3 [set p-distance-to-activities-coefficient 1]
+   ]
+end
+
+to copy-params [ptarget]
+  set p-distance-to-roads-coefficient [p-distance-to-roads-coefficient] of ptarget
+  set p-distance-to-center-coefficient [p-distance-to-center-coefficient] of ptarget
+  set p-density-coefficient [p-density-coefficient] of ptarget
+  set p-distance-to-activities-coefficient [p-distance-to-activities-coefficient] of ptarget
+end
+
+
+;;
+;
+to setup-centres
+ 
+ ifelse not config-from-file? [
+  ;;random setup
+  create-centres centers-number [
+    set shape "circle" set size 1 set color red
+    ifelse centers-number > 1 [
+    setxy random-xcor random-ycor]
+    [setxy 0 0]
+  ]
+  ]
+  [
+    ;;read configuration from GIS files
+    ;;we set also roads here, because need to set
+    ;;the envelope here
+    output-print "Reading from GIS files"
+    set centers-gis-layer gis:load-dataset centers-gis-layer-path
+    set paths-gis-layer gis:load-dataset paths-gis-layer-path
+    let env gis:envelope-union-of gis:envelope-of centers-gis-layer gis:envelope-of paths-gis-layer
+    gis:set-world-envelope (list (item 0 env - 0.02) (item 1 env + 0.02)(item 2 env - 0.02) (item 3 env + 0.02)) 
+   
+    let num 1 ;;var for number of centers with a != 0
+    foreach gis:feature-list-of centers-gis-layer [
+      ?1 ->
+       ;;read attribute
+       let act gis:property-value ?1 "activity"
+       foreach gis:vertex-lists-of ?1 [
+          ?2 -> 
+          let loc gis:location-of first ?2
+          create-centres 1 [
+              set shape "circle" set size 1 set activity act setxy first loc last loc
+              ;color set later because don't know yet number of activities
+              ifelse act != 0 [set number num set num num + 1][set number 0]
+          ]
+       ]
+    ]
+    
+    set activities-number max [activity] of centres + 1
+    ask centres [set color center-color]
+    
+    ;;setup network.
+    ;;not so evident, have to grip extremity from location of extremities of a line
+    ;;implying an equality threshold, could because a problem in "fine" configurations
+    ;;must care to have very small threshold,
+    ;;avoiding however non-connexity that is a real issue (NOT authorised)
+    foreach gis:feature-list-of paths-gis-layer [
+      ?1 ->
+      foreach gis:vertex-lists-of ?1 [
+        ?2 ->
+         let current-vertex gis:location-of first ?2
+         foreach but-first ?2 [
+            ?3 ->
+            let next-vertex gis:location-of ?3
+            let next-extr extremity-intersection-of-gis-feature next-vertex
+            ask extremity-intersection-of-gis-feature current-vertex [
+              create-path-with next-extr [
+                 new-path
+              ]
+            ]
+            set current-vertex next-vertex
+         ]
+      ]
+    ]
+    
+]
+  
+end
+
+
+to-report extremity-intersection-of-gis-feature [feature-location]
+  ;;reports new or existing intersection corresponding 
+  ;;arg is a location
+  let res nobody
+  let x first feature-location let y last feature-location
+  create-intersections 1 [
+    setxy x y set hidden? true
+    let candidates-centers centres in-radius 0.3
+    let candidates-inters other intersections in-radius 0.3
+    ifelse count candidates-inters > 0 [set res one-of candidates-inters][
+      ifelse count candidates-centers > 0 [
+        set res one-of candidates-centers
+      ][
+      set res self
+      ]
+    ]
+    if count candidates-inters > 0 or count candidates-centers > 0 [
+      die 
+    ]
+  ] 
+  report res
+end
+
+
+;;
+; setup function
+; built core structure with centers
+to setup-network
+  ;;minimal network if not config-from-file
+  if not config-from-file? [
+    ask centres [create-paths-with ((other centres) with-min [distance myself]) with [not path-neighbor? myself][new-path]]
+    let clusters []
+    while [length clusters = 0 or length clusters > 2] [
+      nw:set-context turtles links
+      set clusters nw:weak-component-clusters
+      ;take one cluster, connects with the closest
+      let c1 first sort-by [[?1 ?2] -> ([pxcor] of first ?1 < [pxcor] of first ?2) or (([pxcor] of first ?1 = [pxcor] of first ?2) and ([pycor] of first ?1 < [pycor] of first ?2))] (map [? -> sort-by [[?1 ?2] -> ([pxcor] of ?1 < [pxcor] of ?2) or (([pxcor] of ?1 = [pxcor] of ?2) and ([pycor] of ?1 < [pycor] of ?2))] ?] clusters)
+      let dmin dmax let tmin1 one-of turtles let tmin2 one-of turtles
+      
+      ;; iterate over clusters
+      ;;  Beware : new nw extension version --> agentsets and not lists, need to convert
+      foreach clusters[
+        ?1 ->
+        let aux remove 0 c1
+        foreach to-list ?1 [?2 -> set aux remove ?2 aux]
+        if  not empty? aux [
+          let d dmax let t1 one-of c1 let t2 one-of ?1
+          foreach to-list ?1 [
+            ?3 ->
+            let t ?3
+            foreach c1 [
+              ?4 ->
+              ask ?4 [if distance t < d [set d distance t set t1 self set t2 t]] 
+            ]
+          ]
+          show d
+          if d < dmin [set dmin d set tmin1 t1 set tmin2 t2]
+        ]
+      ]
+      
+      if tmin1 != tmin2 [
+        ask tmin1 [create-path-with tmin2 [new-path]]
+      ]
+      
+    ]
+  ]
+end
+
+
+
+
+;;random setup of activities
+to setup-center-activities
+  if not config-comparison? [
+  if not config-from-file? [
+    ;random distribution of Ncenters/Nactivities centers for each activities
+    let c []
+    ask centres [set c fput self c] ;convert agentset to list
+    let n floor (count centres) / activities-number
+    let a 0
+    repeat activities-number [
+      foreach n-of n c [
+          ? ->
+        ask ? [
+          set activity a
+          set c remove self c
+        ]
+      ] 
+      set a a + 1
+    ]
+    ask centres [set color center-color]
+  ]
+  ]
+end
+
+
+;;hand call function to visualize a particular conf
+;;given the formated ID
+;;used to visu back "good" conf
+;;works with id both as string or int
+;;beware to have good size of conf !
+to force-activity-distrib [id]
+  carefully [
+    let conf-list as-char-list int-to-string id
+    foreach sort-on [number] (centres with [number > 0])[
+      ? ->
+      ask ? [set activity string-to-int first conf-list set conf-list but-first conf-list]
+    ]
+    color-centres
+  ][
+     ;does not rise exception if size smaller, no pb
+     ;debilou, exception never raised! :p
+     output-print error-message
+     output-print "Wrong size of configuration id"
+  ]
+end
+
+
+
+;;setup of reporter related vars and structures
+to setup-reporters
+  ;;settings for moran index
+  set moran-populations table:make
+
+  
+  ;;setup output file if needed
+  set output-reporter-names  ["eval-density" "spatial-autocorrelation-index" "eval-speed" "eval-activities" "eval-economic"]
+  if output-file?[
+    set output-file-name word word "../Logs/" date-and-time ".log"
+    let first-line ""
+    foreach output-reporter-names [? -> set first-line word first-line ? if ? != last output-reporter-names [set first-line word first-line ";"]]
+    print-in-file output-file-name first-line
+  ]
+  
+  ;; data export
+  set data-to-export []
+  let origin-center one-of centres
+  set data-export-patches to-list patches ; with [(pxcor - [pxcor] of origin-center) mod 5 = 0 and (pycor - [pycor] of origin-center) mod 5 = 0]
+  
+  ;; movie
+  ;if export-movie? [
+  ;  movie-cancel
+  ;  movie-start (word "mov/" config-name ".mov")
+  ;  movie-set-frame-rate 2
+  ;  movie-grab-view
+  ;]
+  
+  set values-table table:make
+  
+end
+
+
+;;clear agents but keep world configuration
+;;for exploration purposes
+to clear
+  ask houses [die]
+  ask intersections [die] ask links [die]
+  ask one-of centres [create-path-with one-of other centres [new-path]]
+  ask patches [set constructed? false set constructible? true]
+  ask links [foreach footprint [? -> ask ? [set constructible? false]]] 
+  setup-network
+end
+
+;setup but keeping globals
+to clear-but-globals
+  reset-ticks
+  ask turtles [die]
+  ask intersections [die] ask links [die]
+  setup-centres  
+  setup-network
+  setup-center-activities
+  setup-patches
+  setup-reporters
+end
+
+
+
+
+
+
