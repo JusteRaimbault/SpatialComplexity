@@ -257,7 +257,7 @@ to setup-configuration [configuration]
       set e2 one-of centres with [abs (xcor - first e2-loc) < 0.01 and abs (ycor - last e2-loc) < 0.01]
       
       ;output-print (sentence "Linking " e1 " to " e2 e1-loc e2-loc)
-      if e1 != e2 [ask e1 [create-path-with e2 [new-path set internal? true]]]
+      if e1 != e2 [ask e1 [create-path-with e2 [new-path set path:internal? true]]]
     ]
     
     ;;connect to roads at this point
@@ -480,7 +480,7 @@ to connect-to-roads [centers]
   foreach centers[
     ? ->
     ask ? [
-      let closest-road first sort-on [distance-to-point [xcor] of myself [ycor] of myself] (paths with [not internal?]);;note : nearest-link acts on paths
+      let closest-road first sort-on [distance-to-point [xcor] of myself [ycor] of myself] (paths with [not path:internal?]);;note : nearest-link acts on paths
       if not member? closest-road boundary-roads [set boundary-roads lput closest-road boundary-roads]
     ]
   ]
@@ -493,7 +493,7 @@ to connect-to-roads [centers]
         let inter projection-of [xcor] of closest-center [ycor] of closest-center
         let e1 end1 let e2 end2
         let must-die? false
-        if inter != nobody [ask inter [set hidden? true if inter != e1 and inter != e2 [create-path-with e1 [new-path] create-path-with e2 [new-path] set must-die? true] if inter != closest-center [create-path-with closest-center [new-path set internal? true]]]]
+        if inter != nobody [ask inter [set hidden? true if inter != e1 and inter != e2 [create-path-with e1 [new-path] create-path-with e2 [new-path] set must-die? true] if inter != closest-center [create-path-with closest-center [new-path set path:internal? true]]]]
         set connected-centers lput closest-center connected-centers
         if must-die? [die]
         ;set color blue

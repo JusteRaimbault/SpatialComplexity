@@ -116,12 +116,12 @@ end
 to update-network-distances
   ;snapshot of the network
   nw:set-context turtles paths
-  ask paths [set path-length link-length]
+  ask paths [set path:length link-length]
   ask intersections [
-     set net-d-to-centre intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path-length"] centres "path-length"
+     set net-d-to-centre intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path:length"] centres "path:length"
      let a 0 set net-d-to-activities [] repeat activities-number [set net-d-to-activities lput 0 net-d-to-activities ]
      repeat activities-number [
-       set net-d-to-activities replace-item a net-d-to-activities (intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path-length"] (centres with [activity = a]) "path-length")
+       set net-d-to-activities replace-item a net-d-to-activities (intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path:length"] (centres with [activity = a]) "path:length")
        set a a + 1
      ]
    ]
@@ -131,7 +131,7 @@ to update-network-distances
     let a 0 set net-d-to-activities [] repeat activities-number [set net-d-to-activities lput 0 net-d-to-activities ]
     repeat activities-number [
        ifelse activity != a [
-         set net-d-to-activities replace-item a net-d-to-activities (intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path-length"] (centres with [activity = a]) "path-length")
+         set net-d-to-activities replace-item a net-d-to-activities (intvalue nw:weighted-distance-to first sort-on [intvalue nw:weighted-distance-to myself "path:length"] (centres with [activity = a]) "path:length")
        ][set net-d-to-activities replace-item a net-d-to-activities 0]
        set a a + 1
     ]
@@ -244,8 +244,8 @@ end
 ;;path
 to new-path
   set color red set thickness 0.3
-  set path-length path-length
-  set internal? false
+  set path:length link-length
+  set path:internal? false
 end
 
 ;;house

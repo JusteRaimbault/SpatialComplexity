@@ -84,10 +84,10 @@ to setup-patches
           let dists map [p -> distance p] centers
           let w map [d -> d / sum dists] dists
           set pw w set pdists dists
-        set p-distance-to-roads-coefficient scalar-product (map [p -> [p-distance-to-roads-coefficient] of p] centers) w
-        set p-distance-to-center-coefficient scalar-product (map [p -> [p-distance-to-center-coefficient] of p] centers) w
-        set p-density-coefficient scalar-product (map [p -> [p-density-coefficient] of p] centers) w
-        set p-distance-to-activities-coefficient scalar-product (map [p -> [p-distance-to-activities-coefficient] of p] centers) w
+        set p-distance-to-roads-coefficient list:scalar-product (map [p -> [p-distance-to-roads-coefficient] of p] centers) w
+        set p-distance-to-center-coefficient list:scalar-product (map [p -> [p-distance-to-center-coefficient] of p] centers) w
+        set p-density-coefficient list:scalar-product (map [p -> [p-density-coefficient] of p] centers) w
+        set p-distance-to-activities-coefficient list:scalar-product (map [p -> [p-distance-to-activities-coefficient] of p] centers) w
         ]
       ]
    

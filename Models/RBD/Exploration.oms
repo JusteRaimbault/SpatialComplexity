@@ -1,34 +1,60 @@
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import Model._
+// variables
+//val weightDensity = Val[Double]
+//val weightCenter = Val[Double]
+//val weightRoad = Val[Double]
+val centerNumber = Val[Int]
+val paramMode = Val[String]
+val pCorrDist = Val[Double]
 
-//weightDensity weightCenter weightRoad centerNumber
-val exploration = ExplorationTask(
-  ((((weightDensity in (0.0 to 1.0 by 0.5)) x
-    (weightCenter in (0.0 to 1.0 by 0.5)) x
-    (weightRoad in (0.0 to 1.0 by 0.5))
-  ) filter ("weightDensity + weightCenter + weightRoad > 0")) withIndex id )
-  /*(LHS(
-    1,
-    weightDensity in Range(0.0,1.0),
-    weightCenter in Range(0.0,1.0),
-    weightRoad in Range(0.0,1.0)
-  ) withIndex id)*/
-  x (centerNumber is 1) x (replication in UniformDistribution[Int]() take 50)
-)
+// indicators
+val networkSpeed = Val[Double]
+val localDensity = Val[Double]
+val globalDensity = Val[Double]
+val moran = Val[Double]
 
-//val purpose = "test"
-val purpose = "gridexplo"
+val partitionDistances = Val[Array[Double]]
+val nullPartitionDistances = Val[Array[Double]]
 
-val eval = exploration -< model
 
-val indics_hook = AppendToCSVFileHook(workDirectory / "res" / "exploration" / ((new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")).format(new Date()))+"_"+purpose+".csv") set (
-  arraysOnSingleRow := true
+val id = Val[Int]
+val replication = Val[Int]
+
+//  setup-headless [weight-density weight-center weight-road #-centres final-time random-sd]
+// indicators : [ eval-speed , eval-density , spatial-autocorrelation-index , global-density]
+val cmds = Seq("setup-headless 1.0 1.0 1.0 \"${paramMode}\" ${centerNumber} 30 ${pCorrDist} ${replication}","run-experiment")
+
+val model =
+NetLogo5Task(workDirectory / "HEADLESS_base.nlogo",cmds,embedWorkspace=true) set(
+    inputs += (centerNumber,paramMode,pCorrDist,replication,id),
+    outputs += (centerNumber,paramMode,pCorrDist,replication,id),
+    netLogoOutputs += ("eval-speed", networkSpeed),
+    netLogoOutputs += ("eval-density", localDensity),
+    netLogoOutputs += ("global-density", globalDensity),
+    netLogoOutputs += ("spatial-autocorrelation-index", moran),
+    netLogoOutputs += ("partition-distances",partitionDistances),
+    netLogoOutputs += ("null-partition-distances",nullPartitionDistances)
 )
 
 val local = LocalEnvironment(50)
 //val grid = DIRACEnvironment("vo.complex-systems.eu")
 
-//exploration -< (model on grid by 300 hook indics_hook)
-exploration -< (model on local hook indics_hook)
+
+val exploration = DirectSampling(
+  evaluation = (model on local hook indics_hook),
+  //sampling = (((centerNumber in 1 to 10 by 1) x (paramMode in Seq("closest-center","linear-gradient","random-local")) x (pCorrDist in Seq(1.0,2.0,5.0))) withIndex id) x (replication in UniformDistribution[Int]() take 100)
+  sampling = (((centerNumber is 4) x (paramMode is "closest-center") x (pCorrDist is 2.0)) withIndex id) x (replication is 0)
+)
+
+val purpose = "TEST"
+//val purpose = "GRID"
+
+
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")).format(new Date()))+"_"+purpose+".csv") set (
+  arraysOnSingleRow := true
+)
+
+
+exploration

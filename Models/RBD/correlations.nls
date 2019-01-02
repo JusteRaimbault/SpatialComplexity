@@ -1,0 +1,146 @@
+
+;;
+; correlation network analysis
+
+
+;;
+; construct the correlation network
+to correlations:construct-correlation-network
+ 
+  correlations:setup-correlation-nodes
+
+  correlations:setup-correlation-links
+  
+  
+end
+
+
+;;
+; setup nodes
+to correlations:setup-correlation-nodes
+  ask corr-nodes [die]
+  
+  ; fixed size -> FIXME as parameter
+  ask patches with [pxcor mod corrnw-step = 0 and pycor mod corrnw-step = 0][
+    sprout-corr-nodes 1 [
+      set size 1 set shape "circle" set color green
+      let estimation-set to-list (patches in-radius (2 * corrnw-step))
+      set corr-node:lagged-corr-profile (list (lagged-corrs-patches "density" "centre-distance" taumax 5 estimation-set) (lagged-corrs-patches "density" "road-distance" taumax 5 estimation-set) (lagged-corrs-patches "centre-distance" "road-distance" taumax 5 estimation-set))
+    ]
+  ]
+  
+  
+end
+
+
+;;
+; setup links
+
+to correlations:setup-correlation-links
+  ask corr-links [die] 
+  
+  ask corr-nodes [
+    create-corr-links-with other corr-nodes with [not corr-link-neighbor? myself and distance myself < corrnw-step * (sqrt 2 + 0.1)][
+      let dist correlations:dist [corr-node:lagged-corr-profile] of end1 [corr-node:lagged-corr-profile] of end2
+      set corr-link:weight 1 / ( 1 + dist ^ p-corr-dist)
+      ;set corr-link:weight exp (- dist)
+      set thickness corr-link:weight
+    ] 
+  ]
+  
+  ; thresholding
+  ;ask corr-links with [corr-link:weight < 0.1] [die]
+end
+
+to-report correlations:dist [p1 p2]
+  let res 0
+  (foreach p1 p2 [
+    [p1t p2t] -> 
+      ; l2 dist : too much noise ?
+      ;let d list:minus p1t p2t
+      ;set res res + list:scalar-product d d
+    
+      ; -> use argmax rho_tau
+      let i1m list:max-index (map abs (sublist p1t 0 (taumax + 1))) let i1p list:max-index (map abs (sublist p1t taumax (2 * taumax + 1)))
+      let i2m list:max-index (map abs (sublist p2t 0 (taumax + 1))) let i2p list:max-index (map abs (sublist p2t taumax (2 * taumax + 1)))
+      set res res + ((i1m - i2m) ^ 2) + ((i1p - i2p) ^ 2)
+   ])
+  report sqrt res
+end
+
+
+to correlations:communities
+  nw:set-context corr-nodes corr-links
+  let communities nw:weighted-louvain-communities "corr-link:weight"
+  ;show length communities
+  let colors sublist base-colors 0 (length communities) 
+  let currentcom 0
+  (foreach communities colors [ [community col] ->
+    ask community [
+      set color col
+      set corr-node:community currentcom
+      set corr-node:closest-center [who] of one-of centres with-min [distance myself]
+    ]
+    set currentcom currentcom + 1
+  ])
+  
+end
+
+to-report correlations:partition-distance
+  
+  let rescom 0 let rescent 0 
+  
+  let communities remove-duplicates [corr-node:community] of corr-nodes
+  let centers remove-duplicates [corr-node:closest-center] of corr-nodes
+  
+  foreach communities [
+    community ->
+    let current-nodes corr-nodes with [corr-node:community = community]
+    let p rep 0 (length centers)
+    ask current-nodes [set p replace-item (corr-node:closest-center) p ((item corr-node:closest-center p) + (1 / count current-nodes))]
+    set rescom rescom + (1 - list:scalar-product p p)
+  ]
+  
+  foreach centers [
+    center ->
+    let current-nodes corr-nodes with [corr-node:closest-center = center]
+    let p rep 0 (length communities)
+    ask current-nodes [set p replace-item corr-node:community p ((item corr-node:community p) + (1 / count current-nodes))]
+    set rescent rescent + (1 - list:scalar-product p p)
+  ]
+  
+  report rescom / length communities + rescent / length centers
+end
+
+
+;;
+;
+to-report correlations:bootstrapped-partition-distance
+  
+  let bootstrap-num 100
+  
+  let res []
+  let resnull []
+  
+  repeat bootstrap-num [
+    correlations:communities
+    set res lput correlations:partition-distance res
+    
+  ]
+  
+  repeat bootstrap-num [
+    ; null model : random com and/or center ? com only, center fixed
+    ;let communities remove-duplicates [corr-node:community] of corr-nodes
+    ;ask corr-nodes [set corr-node:community first shuffle communities]
+    
+    ; shuffle weights
+    let remainingweights shuffle [corr-link:weight] of corr-links
+    ask corr-links [set corr-link:weight first remainingweights set remainingweights but-first remainingweights]
+    let avgnull 0 repeat 10 [correlations:communities set avgnull avgnull + correlations:partition-distance]
+    set resnull lput (avgnull / 10) resnull
+  ]
+    
+  report (list res resnull)
+end
+
+

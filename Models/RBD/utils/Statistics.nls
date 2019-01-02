@@ -2,6 +2,12 @@
 ;; Basic Stat functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+to-report statistics:summary [x]
+  report (word "length = " length x "\n mean = " mean x "\n median = " median x "\n min = " min x "\n max = " max x)
+end
+
+
 ; histogram retrieving count list
 ; nbreaks = number of segments
 ; reports counts

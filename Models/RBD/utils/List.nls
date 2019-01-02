@@ -146,7 +146,7 @@ end
 
 ;;
 ; reports index of min (last in case of multiple)
-to-report min-index [l]
+to-report list:min-index [l]
   let mi first l let res 0 let rem but-first l let i 1
   while [length rem > 0][
     if first rem <= mi [set mi first rem set res i]
@@ -158,7 +158,7 @@ end
 
 ;;
 ; index of max
-to-report max-index [l]
+to-report list:max-index [l]
   let ma first l let res 0 let rem but-first l let i 1
   while [length rem > 0][
     if first rem >= ma [set ma first rem set res i]
@@ -178,7 +178,7 @@ end
 ;;
 ; Computes scalar product between two lists
 ;  if different lengths, take minimum
-to-report scalar-product [l1 l2]
+to-report list:scalar-product [l1 l2]
   let res 0
   let n min list (length l1) (length l2) let i 0
   repeat n [

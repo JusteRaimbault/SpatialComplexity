@@ -5,7 +5,7 @@
 
 ;;
 ;
-to setup-headless [weight-density weight-center weight-road #-centres final-time random-sd]
+to setup-headless [weight-density weight-center weight-road param-mode #-centres final-time pdist random-sd]
   
   ca
   
@@ -33,7 +33,8 @@ to setup-headless [weight-density weight-center weight-road #-centres final-time
   
   ;set patch-param-mode "linear-gradient" ; in [uniform ; random-local; closest-center]
   ;set patch-param-mode "closest-center"
-  set patch-param-mode "random-local"
+  ;set patch-param-mode "random-local"
+  set patch-param-mode param-mode
   
   set distance-road-needed 2.2  ; \in [dmin;dmax]  (world size)
   set neighborhood-radius 5     ; \in [dmin;dmax]
@@ -46,6 +47,10 @@ to setup-headless [weight-density weight-center weight-road #-centres final-time
   set p-density 3.0
   set p-speed 3.0
   set moran-grid-factor 10.0 ; \in [1;world-width]
+  
+  set taumax 5
+  set corrnw-step 5
+  set p-corr-dist pdist
   
   ; economic abm
   set move-threshold 0.6  ; \in [0;1]
@@ -88,11 +93,19 @@ to run-experiment
   ; [ eval-speed , eval-density , spatial-autocorrelation-index , global-density]
   ;  ["eval-density" "spatial-autocorrelation-index" "eval-speed" "eval-activities" "eval-economic"]
   
+  correlations:construct-correlation-network
+  correlations:communities
+  
+  let res correlations:bootstrapped-partition-distance
+  set partition-distances first res
+  set null-partition-distances last res
   
 end
 
 
 to test-experiment
-  setup-headless random-float 1 random-float 1 random-float 1 1 30 random 1000
+  ;setup-headless (random-float 1) (random-float 1) (random-float 1) "closest-center" 1 40 random 1000
+  setup-headless 1.0 1.0 1.0 "closest-center" 4 50 2.0 random 1000
   run-experiment
+  ;show correlations:bootstrapped-partition-distance
 end

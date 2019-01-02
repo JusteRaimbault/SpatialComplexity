@@ -41,6 +41,9 @@ __includes[
   "application.nls"
   "exploration.nls"
 
+  ;; corr nw
+  "correlations.nls"
+
   ;;display functions
   "display.nls"
 
@@ -217,6 +220,14 @@ globals[
   p-speed
   moran-grid-factor
 
+  taumax
+  corrnw-step
+  p-corr-dist
+
+  partition-distances
+  null-partition-distances
+
+
   ; economic abm
   move-threshold
   rent-update-radius
@@ -254,6 +265,21 @@ undirected-link-breed[crossing-paths crossing-path]
 ;;points of interest in the city
 ;;each is supposed to have an activity ?
 breed[centres centre]
+
+centres-own[
+
+  ;;integer representing the activity of the center
+  activity
+
+  ;;The numerotation of centers is used during optimisation configuration
+  ;;to make correspond place in conf to the good center
+  ;;only centers with a!=0 are numeroted
+  ;;because we optimise with a fixed activity
+  number
+
+  net-d-to-centre
+  net-d-to-activities
+]
 
 ;;houses
 ;;really useful, since it is coupled with patch construction ?
@@ -308,20 +334,7 @@ patches-own[
 
 
 
-centres-own[
 
-  ;;integer representing the activity of the center
-  activity
-
-  ;;The numerotation of centers is used during optimisation configuration
-  ;;to make correspond place in conf to the good center
-  ;;only centers with a!=0 are numeroted
-  ;;because we optimise with a fixed activity
-  number
-
-  net-d-to-centre
-  net-d-to-activities
-]
 
 
 
@@ -332,10 +345,37 @@ intersections-own[
 ]
 
 paths-own [
-  path-length
+  path:length
 
   ;;additional bool for GA : internal paths need to be differentiated from boundaries
-  internal?
+  path:internal?
+
+]
+
+
+breed [corr-nodes corr-node]
+
+corr-nodes-own [
+
+  ;;
+  ; list of lists giving $\rho_{ij} (tau)$ for $ - \tau_0 \leq \tau \leq \tau_0$ and $i<j$
+  corr-node:lagged-corr-profile
+
+  corr-node:community
+
+  corr-node:closest-center
+
+]
+
+undirected-link-breed [corr-links corr-link]
+
+
+corr-links-own [
+
+  ;;
+  ; weight of the link computed as a distance between correlation profiles
+  corr-link:weight
+
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -388,7 +428,7 @@ BUTTON
 203
 61
 setup random
-setup-headless random-float 1 random-float 1 random-float 1 8 100 random 1000
+setup-headless (random-float 1) (random-float 1) (random-float 1) \"closest-center\" 1 20 2.0 random 1000
 NIL
 1
 T
@@ -406,6 +446,74 @@ BUTTON
 61
 NIL
 run-experiment
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+72
+130
+151
+163
+corr nw
+correlations:construct-correlation-network
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+73
+203
+184
+236
+communities
+correlations:communities\nask patches [set pcolor [color] of one-of corr-nodes with-min [distance myself]]\nshow correlations:partition-distance
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+71
+167
+161
+200
+corr links
+correlations:setup-correlation-links\nshow statistics:summary [corr-link:weight] of corr-links
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+75
+246
+200
+279
+color by center
+ask patches [\n  set pcolor item [who] of one-of centres with-min [distance myself] base-colors\n]
 NIL
 1
 T
