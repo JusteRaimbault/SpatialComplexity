@@ -17,7 +17,7 @@
 
 
 
-extensions[nw table gis context matrix ];convol
+extensions[nw table gis context matrix kmeans];convol
 
 
 __includes[
@@ -223,6 +223,7 @@ globals[
   taumax
   corrnw-step
   p-corr-dist
+  ;global:profile-cluster-number
 
   partition-distances
   null-partition-distances
@@ -364,6 +365,8 @@ corr-nodes-own [
   corr-node:community
 
   corr-node:closest-center
+
+  corr-node:feature
 
 ]
 
@@ -514,6 +517,55 @@ BUTTON
 279
 color by center
 ask patches [\n  set pcolor item [who] of one-of centres with-min [distance myself] base-colors\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+52
+357
+271
+390
+NIL
+correlations:test-clustering
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+61
+395
+301
+428
+global:profile-cluster-number
+global:profile-cluster-number
+0
+20
+9.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+53
+324
+272
+357
+clustering
+correlations:profile-clustering\nshow correlations:partition-distance
 NIL
 1
 T

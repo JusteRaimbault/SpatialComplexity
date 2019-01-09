@@ -63,6 +63,10 @@ to-report correlations:dist [p1 p2]
       ; -> use argmax rho_tau
       let i1m list:max-index (map abs (sublist p1t 0 (taumax + 1))) let i1p list:max-index (map abs (sublist p1t taumax (2 * taumax + 1)))
       let i2m list:max-index (map abs (sublist p2t 0 (taumax + 1))) let i2p list:max-index (map abs (sublist p2t taumax (2 * taumax + 1)))
+      
+      ; -> compare to eucl distance clustering without space ?
+    
+      
       set res res + ((i1m - i2m) ^ 2) + ((i1p - i2p) ^ 2)
    ])
   report sqrt res
@@ -155,5 +159,67 @@ to-report correlations:bootstrapped-partition-distance
     
   report (list res resnull)
 end
+
+
+;;
+;  FIXME - still not the appropriate distance
+to-report correlations:overlap-distance
+  ; compute overlap matrix
+  let communities remove-duplicates [corr-node:community] of corr-nodes 
+  let centers remove-duplicates [corr-node:closest-center] of corr-nodes
+  let overlap-matrix matrix:make-constant (length communities) (length centers) 0
+  let i 0 let j 0
+  repeat length communities [set j 0 repeat length centers [matrix:set overlap-matrix i j (count corr-nodes with [corr-node:community = item i communities and corr-node:closest-center = item j centers]) set j j + 1] set i i + 1]
+  let res 0
+  (foreach communities (seq 0 (length communities - 1) 1) [
+    [community ii] ->
+    let comsize count corr-nodes with [corr-node:community = community]
+    set res res + (comsize - max (matrix:get-row overlap-matrix ii))
+  ])
+  (foreach centers (seq 0 (length centers - 1) 1) [
+    [center jj] ->
+    let comsize count corr-nodes with [corr-node:closest-center = center]
+    set res res + (comsize - max (matrix:get-column overlap-matrix jj))
+  ])
+  report res
+end
+
+
+
+
+
+to correlations:profile-clustering
+  ask corr-nodes [
+    set corr-node:feature concatenate corr-node:lagged-corr-profile
+  ]
+  let clusters kmeans:cluster-by-feature corr-nodes global:profile-cluster-number 1000 0.01 "corr-node:feature"
+  let colors sublist base-colors 0 global:profile-cluster-number
+  (foreach clusters colors (seq 1 global:profile-cluster-number 1) [
+    [cluster col clustnum] -> ask cluster [
+      set corr-node:community clustnum
+      set color col
+   ] 
+  ])
+end
+
+to correlations:test-clustering
+  foreach (seq 1 10 1) [
+    k ->
+    show k
+    set global:profile-cluster-number k
+    let res []
+    repeat 1000 [
+      correlations:profile-clustering
+      ;set res lput correlations:partition-distance res
+      set res lput correlations:overlap-distance res
+    ]
+    show (word "avg-part-dist = " (min res))
+  ]
+end
+
+
+
+
+
 
 
