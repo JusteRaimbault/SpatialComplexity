@@ -90,26 +90,39 @@ to-report correlations:partition-distance
   
   let rescom 0 let rescent 0 
   
-  let communities remove-duplicates [corr-node:community] of corr-nodes
-  let centers remove-duplicates [corr-node:closest-center] of corr-nodes
+  ;let communities remove-duplicates [corr-node:community] of corr-nodes
+  ;let centers remove-duplicates [corr-node:closest-center] of corr-nodes
+  ;let centers remove-duplicates [who] of centres
   
-  foreach communities [
+  foreach remove-duplicates [corr-node:community] of corr-nodes [
     community ->
     let current-nodes corr-nodes with [corr-node:community = community]
-    let p rep 0 (length centers)
-    ask current-nodes [set p replace-item (corr-node:closest-center) p ((item corr-node:closest-center p) + (1 / count current-nodes))]
+    ;let p rep 0 (length centers)
+    let centers table:make foreach remove-duplicates [corr-node:closest-center] of corr-nodes [? -> table:put centers ? 0]
+    ask current-nodes [
+      ;set p replace-item (corr-node:closest-center) p ((item corr-node:closest-center p) + (1 / count current-nodes))
+      table:put centers corr-node:closest-center ((table:get centers corr-node:closest-center) + (1 / count current-nodes)) 
+    ]
+    let p table:values centers
+    ;show sum p
     set rescom rescom + (1 - list:scalar-product p p)
   ]
   
-  foreach centers [
+  foreach remove-duplicates [corr-node:closest-center] of corr-nodes [
     center ->
     let current-nodes corr-nodes with [corr-node:closest-center = center]
-    let p rep 0 (length communities)
-    ask current-nodes [set p replace-item corr-node:community p ((item corr-node:community p) + (1 / count current-nodes))]
+    ;let p rep 0 (length communities)
+    let communities table:make foreach remove-duplicates [corr-node:community] of corr-nodes [? -> table:put communities ? 0]
+    ask current-nodes [
+      ;set p replace-item corr-node:community p ((item corr-node:community p) + (1 / count current-nodes))
+      table:put communities corr-node:community ((table:get communities corr-node:community) + (1 / count current-nodes))
+    ]
+    let p table:values communities
+    ;show sum p
     set rescent rescent + (1 - list:scalar-product p p)
   ]
   
-  report rescom / length communities + rescent / length centers
+  report rescom / (length remove-duplicates [corr-node:community] of corr-nodes) + rescent / (length remove-duplicates [corr-node:closest-center] of corr-nodes)
 end
 
 
