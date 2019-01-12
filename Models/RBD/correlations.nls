@@ -76,7 +76,7 @@ end
 to correlations:communities
   nw:set-context corr-nodes corr-links
   let communities nw:weighted-louvain-communities "corr-link:weight"
-  ;show length communities
+  show length communities
   let colors sublist base-colors 0 (length communities) 
   let currentcom 0
   (foreach communities colors [ [community col] ->
@@ -197,24 +197,158 @@ to correlations:profile-clustering
   (foreach clusters colors (seq 1 global:profile-cluster-number 1) [
     [cluster col clustnum] -> ask cluster [
       set corr-node:community clustnum
-      set color col
+      set color col 
    ] 
   ])
+  ;ask patches [set pcolor [corr-node:closest-center] of one-of corr-nodes with-min [distance myself] * 10 + 5]
 end
 
-to correlations:test-clustering
-  foreach (seq 1 10 1) [
-    k ->
-    show k
-    set global:profile-cluster-number k
-    let res []
-    repeat 1000 [
-      correlations:profile-clustering
-      ;set res lput correlations:partition-distance res
-      set res lput correlations:overlap-distance res
+
+;;
+; report clusters following a given reporter
+to-report correlations:clusters [reporter]
+  let clustnums remove-duplicates ([reporter] of corr-nodes)
+  report map [k -> corr-nodes with [reporter = k]] clustnums
+end
+
+
+;;
+; clusters is a list of agentsets
+to-report correlations:centroids [clusters]
+  report map [? -> (list mean ([xcor] of ?) mean ([ycor] of ?))] clusters
+end
+
+
+;;
+; heuristic based on nodes similarity
+to-report correlations:clustering-nodes-similarity [nbootstrap]
+  let n count corr-nodes
+  let simmat matrix:make-constant n n 0
+  ;let centersimmat matrix:make-constant n n 0 ask corr-nodes [ask corr-nodes [if corr-node:closest-center = [corr-node:closest-center] of myself [
+  ;  matrix:set centersimmat corr-node:id [corr-node:id] of myself ((matrix:get centersimmat corr-node:id [corr-node:id] of myself) + 1)
+  ;  matrix:set centersimmat [corr-node:id] of myself corr-node:id ((matrix:get centersimmat [corr-node:id] of myself corr-node:id) + 1)
+  ;]]]
+  let i 0 ask corr-nodes [set corr-node:id i set i i + 1]
+  repeat nbootstrap [
+    correlations:profile-clustering
+    ask corr-nodes [
+      ask corr-nodes [
+        if corr-node:community = [corr-node:community] of myself [
+          matrix:set simmat corr-node:id [corr-node:id] of myself ((matrix:get simmat corr-node:id [corr-node:id] of myself) + 1)
+          ;matrix:set simmat [corr-node:id] of myself corr-node:id ((matrix:get simmat [corr-node:id] of myself corr-node:id) + 1)
+        ]
+      ] 
     ]
-    show (word "avg-part-dist = " (min res))
   ]
+  
+  set simmat matrix:times-scalar simmat (1 / nbootstrap)
+  
+  ; compute l2 matrix dist
+  ;let diff matrix:minus simmat centersimmat
+  ;report sqrt (sum (map sum matrix:to-row-list (matrix:map [? -> ? * ?] diff)))
+  
+  ask corr-links [die]
+  ask corr-nodes [ask other corr-nodes [let w matrix:get simmat corr-node:id [corr-node:id] of myself create-corr-link-with myself [set corr-link:weight w set thickness corr-link:weight / 5]]]
+  report 0
+end
+
+
+;;
+; distance between cluster centroids for two clustering reporters
+to-report correlations:centroid-distance ;[reporter1 reporter2]
+  let n count corr-nodes
+  let clustnums1 remove-duplicates [corr-node:community] of corr-nodes let clustnums2 remove-duplicates [corr-node:closest-center] of corr-nodes
+  ;let clusters1 correlations:clusters reporter1
+  ;let clusters2 correlations:clusters reporter2
+  let clusters1 map [k -> corr-nodes with [corr-node:community = k]] clustnums1 
+  let clusters2 map [k -> corr-nodes with [corr-node:closest-center = k]] clustnums2
+  let centroids1 correlations:centroids clusters1
+  let centroids2 correlations:centroids clusters2
+  let weights1 map [? -> ? / n] (map count clusters1)
+  let weights2 map [? -> ? / n] (map count clusters2)
+  
+  ;show centroids1 show weights1
+  ;show centroids2 show weights2
+  
+  let dcross 0 (foreach centroids1 weights1 [[c1 w1] -> (foreach centroids2 weights2 [[c2 w2] -> set dcross dcross + (w1 * w2 * sqrt ((first c1 - first c2)^ 2 + (last c1 - last c2)^ 2))])])
+  let d1 0 (foreach centroids1 weights1 [[c1 w1] -> (foreach centroids1 weights1 [[c2 w2] -> set d1 d1 + (w1 * w2 * sqrt ((first c1 - first c2)^ 2 + (last c1 - last c2)^ 2))])])
+  let d2 0 (foreach centroids2 weights2 [[c1 w1] -> (foreach centroids2 weights2 [[c2 w2] -> set d2 d2 + (w1 * w2 * sqrt ((first c1 - first c2)^ 2 + (last c1 - last c2)^ 2))])])
+
+  ;show dcross show d1 show d2
+  
+  report 2 * dcross - d1 - d2  
+end
+
+;;
+; relative spatial radius (average distance to centroid normalized by same measure for the corresponding circle)
+to-report correlations:average-clusters-radius
+  let clustnums1 remove-duplicates [corr-node:community] of corr-nodes let clustnums2 remove-duplicates [corr-node:closest-center] of corr-nodes
+  let clusters1 map [k -> corr-nodes with [corr-node:community = k]] clustnums1 
+  let centroids1 correlations:centroids clusters1
+  let reldists []
+  (foreach clusters1 centroids1 [
+    [cluster centroid] ->
+     let x first centroid let y last centroid let n count cluster
+     set reldists lput ((mean [sqrt ((xcor - x)^ 2 + (ycor - y)^ 2)] of cluster) / (sqrt n / (2 * pi))) reldists
+   ])
+  report mean reldists
+end
+
+
+to-report correlations:bootstrap-clustering-centroid-distance [nbootstrap]
+  
+  let dists []
+  let nulldists []
+  let radiuses []
+  let nullradiuses []
+  
+  repeat nbootstrap [
+    correlations:profile-clustering
+    set dists lput correlations:centroid-distance dists
+    set radiuses lput correlations:average-clusters-radius radiuses
+    ;[? -> [corr-node:community] of ?] [? -> [corr-node:closest-center] of ?]) res
+    
+    ; shuffle clusters
+    let remclusts shuffle [corr-node:community] of corr-nodes
+    ask corr-nodes [set corr-node:community first remclusts set remclusts but-first remclusts]
+    set nulldists lput correlations:centroid-distance nulldists
+    set nullradiuses lput correlations:average-clusters-radius nullradiuses
+  ]
+  
+  report (list dists nulldists radiuses nullradiuses)
+end
+
+
+
+to correlations:test-clustering
+
+  let k 4
+  ;foreach (seq 2 10 1) [
+  ;foreach (seq 4 4 1) [
+  ;  k ->
+  ;  show k
+  
+  set global:profile-cluster-number k
+    
+    ;let res []
+    ;repeat 1000 [
+      ;correlations:profile-clustering
+      ;set res lput correlations:partition-distance res
+    ;  set res lput correlations:overlap-distance res
+    ;]
+    
+    ;let dist correlations:clustering-nodes-similarity 100
+    ;let dists map [? -> ? * k] correlations:bootstrap-clustering-centroid-distance 1000
+    let dists correlations:bootstrap-clustering-centroid-distance 1000
+    
+    ;show (word "avg-part-dist = " (min res))
+    ;show (word "avg-part-dist = " dist)
+    show (word "avg-part-dist = " (mean item 0 dists) " +- " (standard-deviation item 0 dists))
+    show (word "null-model = " (mean item 1 dists) " +- " (standard-deviation item 1 dists))
+    show (word "avg-radius = " (mean item 2 dists) " +- " (standard-deviation item 2 dists))
+    show (word "avg-radius-null = " (mean item 3 dists) " +- " (standard-deviation item 3 dists))
+  
+  ;]
 end
 
 

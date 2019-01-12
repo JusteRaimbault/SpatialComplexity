@@ -5,7 +5,7 @@ library(dplyr)
 library(ggplot2)
 
 
-res<-as.tbl(read.csv('exploration/20190102_17_17_GRID.csv'))
+res<-as.tbl(read.csv('exploration/20190109_14_58_GRID.csv'))
 
 # check counts
 res %>% group_by(id) %>% summarise(count=n())
@@ -25,9 +25,9 @@ res$nullPartitionDistanceIC = apply(res[,nullPartitionDistancesNames],1,function
 # rq : there should exist an appropriate statistic for testing \neq nullmodel
 res$significance = abs(res$avgPartitionDistance - res$avgNullPartitionDistance)/(res$partitionDistanceIC+res$nullPartitionDistanceIC)
 
-res[res$significance>0.8,c("centerNumber","pCorrDist","paramMode")]
+res[res$significance>1.2,c("centerNumber","pCorrDist","paramMode")]
 res[res$significance==max(res$significance),c("centerNumber","pCorrDist","paramMode")]
-
+# -> seems basically mostly noise ?
 
 
 

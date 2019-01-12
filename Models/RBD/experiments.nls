@@ -5,7 +5,7 @@
 
 ;;
 ;
-to setup-headless [weight-density weight-center weight-road param-mode #-centres final-time pdist random-sd]
+to setup-headless [weight-density weight-center weight-road param-mode #-centres final-time clusters random-sd]
   
   ca
   
@@ -50,7 +50,11 @@ to setup-headless [weight-density weight-center weight-road param-mode #-centres
   
   set taumax 5
   set corrnw-step 5
-  set p-corr-dist pdist
+  ;set p-corr-dist pdist
+  set p-corr-dist 1
+  
+  set global:profile-cluster-number clusters
+  set global:clustering-bootstraps 1000
   
   ; economic abm
   set move-threshold 0.6  ; \in [0;1]
@@ -94,11 +98,16 @@ to run-experiment
   ;  ["eval-density" "spatial-autocorrelation-index" "eval-speed" "eval-activities" "eval-economic"]
   
   correlations:construct-correlation-network
-  correlations:communities
   
-  let res correlations:bootstrapped-partition-distance
-  set partition-distances first res
-  set null-partition-distances last res
+  ;correlations:communities
+  ;let res correlations:bootstrapped-partition-distance
+  
+  let dists correlations:bootstrap-clustering-centroid-distance global:clustering-bootstraps
+  
+  set partition-distances item 0 dists
+  set null-partition-distances item 1 dists
+  set clusters-radius item 2 dists
+  set null-clusters-radius item 3 dists
   
 end
 
@@ -108,10 +117,17 @@ to test-experiment
   ;centerNumber=10, id=84, openmole$seed=6903421332515852231, pCorrDist=1.0, paramMode=linear-gradient, replication=-654654258
   ; setup-headless [weight-density weight-center weight-road param-mode #-centres final-time pdist random-sd
   ;setup-headless 1.0 1.0 1.0 "linear-gradient" 10 30 1.0 -654654258
-  setup-headless 1.0 1.0 1.0 "linear-gradient" 4 30 1.0 654258
+  
+  ;setup-headless 1.0 1.0 1.0 "linear-gradient" 4 30 1.0 654258
+  setup-headless 1.0 1.0 1.0 "uniform" 4 30 1.0 654258
   
   run-experiment
   ;show correlations:bootstrapped-partition-distance
+  ;correlations:test-clustering
+  show partition-distances
+  show null-partition-distances
+  show clusters-radius
+  show null-clusters-radius
 end
 
 

@@ -223,10 +223,13 @@ globals[
   taumax
   corrnw-step
   p-corr-dist
-  ;global:profile-cluster-number
+  global:profile-cluster-number
+  global:clustering-bootstraps
 
   partition-distances
   null-partition-distances
+  clusters-radius
+  null-clusters-radius
 
 
   ; economic abm
@@ -367,6 +370,8 @@ corr-nodes-own [
   corr-node:closest-center
 
   corr-node:feature
+
+  corr-node:id
 
 ]
 
@@ -528,9 +533,9 @@ NIL
 1
 
 BUTTON
-52
+53
 357
-271
+272
 390
 NIL
 correlations:test-clustering
@@ -544,21 +549,6 @@ NIL
 NIL
 1
 
-SLIDER
-61
-395
-301
-428
-global:profile-cluster-number
-global:profile-cluster-number
-0
-20
-10.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
 53
 324
@@ -566,6 +556,23 @@ BUTTON
 357
 clustering
 correlations:profile-clustering\nshow correlations:partition-distance
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+76
+465
+196
+498
+hide corr links
+ask corr-links [set hidden? false]\nask corr-links with [corr-link:weight < 0.9][set hidden? true]
 NIL
 1
 T

@@ -7,7 +7,9 @@ import java.util.Date
 //val weightRoad = Val[Double]
 val centerNumber = Val[Int]
 val paramMode = Val[String]
-val pCorrDist = Val[Double]
+//val pCorrDist = Val[Double]
+//same cluster number as centers
+//val clusters = Val[Int]
 
 // indicators
 val networkSpeed = Val[Double]
@@ -22,14 +24,14 @@ val nullPartitionDistances = Val[Array[Double]]
 val id = Val[Int]
 val replication = Val[Int]
 
-//  setup-headless [weight-density weight-center weight-road #-centres final-time random-sd]
+//  setup-headless [weight-density weight-center weight-road param-mode #-centres final-time clusters random-sd
 // indicators : [ eval-speed , eval-density , spatial-autocorrelation-index , global-density]
-val cmds = Seq("setup-headless 1.0 1.0 1.0 \"${paramMode}\" ${centerNumber} 30 ${pCorrDist} ${replication}","run-experiment")
+val cmds = Seq("setup-headless 1.0 1.0 1.0 \"${paramMode}\" ${centerNumber} 30 ${centerNumber} ${replication}","run-experiment")
 
 val model =
 NetLogo6Task(workDirectory / "HEADLESS_base.nlogo",cmds,embedWorkspace=true) set(
-    inputs += (centerNumber,paramMode,pCorrDist,replication,id),
-    outputs += (centerNumber,paramMode,pCorrDist,replication,id),
+    inputs += (centerNumber,paramMode,replication,id),
+    outputs += (centerNumber,paramMode,replication,id),
     netLogoOutputs += ("eval-speed", networkSpeed),
     netLogoOutputs += ("eval-density", localDensity),
     netLogoOutputs += ("global-density", globalDensity),
@@ -38,20 +40,25 @@ NetLogo6Task(workDirectory / "HEADLESS_base.nlogo",cmds,embedWorkspace=true) set
     netLogoOutputs += ("null-partition-distances",nullPartitionDistances)
 )
 
-//val purpose = "TEST"
-val purpose = "GRID"
+val purpose = "TEST"
+//val purpose = "GRID"
 
-val local = LocalEnvironment(50)
-//val grid = DIRACEnvironment("vo.complex-systems.eu")
+val env = LocalEnvironment(50)
+//val env = DIRACEnvironment("vo.complex-systems.eu")
 
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HH_mm")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
 val exploration = DirectSampling(
-  evaluation = (model on local hook indics_hook),
-  sampling = (((centerNumber in (1 to 10 by 1)) x (paramMode in Seq("closest-center","linear-gradient","random-local")) x (pCorrDist in Seq(1.0,2.0,5.0))) withIndex id) x (replication in UniformDistribution[Int]() take 50)
-  //sampling = (((centerNumber is 4) x (paramMode is "closest-center") x (pCorrDist is 2.0)) withIndex id) x (replication is 0)
+  evaluation = (model on env hook indics_hook),
+  /*sampling = ((
+    (centerNumber in (1 to 10 by 1))
+    x (paramMode in Seq("closest-center","linear-gradient","uniform"))
+    //x (pCorrDist in Seq(1.0,2.0,5.0))
+  ) withIndex id)
+    x (replication in UniformDistribution[Int]() take 50)*/
+  sampling = (((centerNumber is 4) x (paramMode is "closest-center")) withIndex id) x (replication is 0)
 )
 
 exploration
