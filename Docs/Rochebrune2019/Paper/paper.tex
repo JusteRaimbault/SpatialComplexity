@@ -105,10 +105,9 @@ Les systèmes territoriaux, qui peuvent être compris comme des structures socio
 
 Notre appréhension des systèmes territoriaux se place plus particulièrement dans la lignée de la théorie évolutive des villes~\citep{pumain1997pour} qui comprend les systèmes urbains comme des systèmes multi-niveaux, dans lesquels la co-évolution des multiples composants et agents détermine la dynamique de ceux-ci~\citep{raimbault2018caracterisation}.
 
-Le concept de complexité correspond à de diverses approches et définitions \citep{chu2008criteria,deffuant2015visions}. Un précédent travail par \cite{raimbault2018relating} s'était proposé de suggérer des ponts épistémologiques entre différentes approches et définitions de la complexité
+Le concept de complexité correspond à de diverses approches et définitions, qui dépendent des domaines où elles sont introduites. Par exemple, \cite{chu2008criteria} passe en revue les approches conceptuelles et opérationnelles liée champ de la vie artificielle et montre qu'il n'existe pas de concept unifié. \cite{deffuant2015visions} développe aussi différentes visions de la complexité, allant d'une complexité proche d'une complexité computationnelle à une complexité irréductible propre aux systèmes sociaux. Un précédent travail par \cite{raimbault2018relating} s'était proposé de suggérer des ponts épistémologiques entre différentes approches et définitions de la complexité, et plus particulièrement les liens entre complexité au sens d'émergence, complexité computationnelle et complexité informationnelle. Nous tâchons ici d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux.
 
-Nous tâchons ici d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux.
-
+La suite de cet article est organisée de la façon suivante : dans deux premières sections nous développons une approche conceptuelle de la complexité ontologique et de l'émergence au sein des systèmes territoriaux. Nous présentons ensuite des résultats de simulation d'un modèle de morphogenèse urbaine exhibant des propriétés typiques de la complexité dynamique. Une autre expérience permet ensuite de montrer le lien entre complexité et co-évolution. Nous discutons finalement les implications des ces résultats et des développements possibles.
 
 
 
@@ -145,6 +144,23 @@ exemple de la microsim \cite{birkin2011spatial}
 
 
 
+%%%%%%%%%%%%%%%%
+\section{Complexité et émergence}
+%%%%%%%%%%%%%%%%
+
+
+
+Notre dernière entrée s'intéresse à la complexité en tant qu'émergence faible de structures et autonomie des niveaux supérieurs~\citep{bedau2002downward}, de manière théorique. Nous rappelons le caractère intrinsèquement multi-échelle des systèmes territoriaux, qui se manifeste par exemple dans l'approche des villes comme systèmes au sein de systèmes de villes (\cite{pumain1997pour} enrichissant \cite{berry1964cities}). Par ailleurs, il existe une nécessité actuelle de production de modèles spatiaux l'intégrant effectivement~\citep{rozenblat2018conclusion}, dans le but de modèles effectivement opérationnels.
+
+La difficulté d'endogénéisation de niveau supérieurs autonomes peut par exemple être illustrée par~\cite{lenechet:halshs-01272236} qui propose un modèle de co-évolution entre transport et usage du sol à l'échelle métropolitaine intégrant une structure de gouvernance endogène pour le réseau de transport. Simulant les négociations entre acteurs locaux du transport, certains régimes conduisent à l'émergence d'un niveau intermédiaire de gouvernance issu de la collaboration entre acteurs voisins. Les trois niveaux décisionnels sont alors bien autonomes ontologiquement mais aussi en termes de dynamiques. L'émergence de la collaboration est finement liée à la structure spatiale, puisque les acteurs incluent les motifs d'accessibilité dans leur processus de prise de décision.
+
+Des systèmes de complexité ontologique moindre présentent aussi un rôle crucial de l'émergence faible. L'état local d'un flux de trafic est en partie conséquence de l'état global du système, en particulier lorsque des motifs de congestion conséquents sont observables à l'échelle macroscopique. Dans ce cas, les motifs spatio-temporels sont encore cruciaux dans le processus d'émergence \citep{treiber2010three}.
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%
 \section{Complexité dynamique}
 %%%%%%%%%%%%%%%%%
@@ -153,21 +169,18 @@ exemple de la microsim \cite{birkin2011spatial}
 \subsection{Systèmes dynamiques, chaos et fractales}
 
 
-La compréhension des systèmes complexes comme systèmes dynamiques aux attracteurs plus ou moins chaotiques a été largement développée en géographie \citep{dauphine1995chaos}. Par exemple, \cite{e18060197} considère que l'information sémantique d'un environnement urbain est liée aux attracteurs de systèmes dynamiques régissant les dynamiques de ses agents. Ce type d'approche peut par ailleurs être rapprochée des approches fractales des systèmes urbains, initialement introduites par \cite{batty1994fractal}, et par exemple plus récemment appliquées à des problèmes réels de planification urbaine \cite{yamu2015spatial}.
+La compréhension des systèmes complexes comme systèmes dynamiques aux attracteurs plus ou moins chaotiques a été largement développée en géographie \citep{dauphine1995chaos}. Par exemple, \cite{e18060197} considère que l'information sémantique d'un environnement urbain est liée aux attracteurs de systèmes dynamiques régissant les dynamiques de ses agents. Ce type d'approche peut par ailleurs être rapprochée des approches fractales des systèmes urbains, initialement introduites par \cite{batty1994fractal}, et par exemple plus récemment appliquées à des problèmes réels de planification urbaine \citep{yamu2015spatial}. Ces questions sont liées plus généralement à des problématiques de chaos spatio-temporel \citep{crutchfield1987phenomenology}
 
 Spatio temporal chaos
-\cite{chen2009urban}
-\cite{crutchfield1987phenomenology}
+
 \cite{chen2009urban}
 
 
 \subsection{Non-ergodicité et sensibilité aux conditions initiales}
 
-Nous utilisons ici un modèle de morphogenèse urbaine introduit par \cite{raimbault2018calibration} pour illustrer les propriétés de non-ergodicité et de dépendance au chemin des systèmes territoriaux~\citep{pumain2012urban}.
+Nous utilisons ici un modèle de morphogenèse urbaine introduit par \cite{raimbault2018calibration} pour illustrer les propriétés de non-ergodicité et de dépendance au chemin des systèmes territoriaux~\citep{pumain2012urban}. En particulier, nous montrons la forte sensibilité des formes urbaines finales simulées aux perturbations spatiales, et plus généralement la dépendance au chemin des trajectoires pour les indicateurs morphologiques agrégés.
 
-En particulier, nous montrons la forte sensibilité des formes urbaines finales simulées aux perturbations spatiales, et plus généralement la dépendance au chemin des trajectoires pour les indicateurs morphologiques agrégés.
-
-L'experience menée par \cite{raimbault2018calibration} sur une version simplifiée à une dimension du modèle montre que les distributions semi-stationnaires de population peuvent être à distance maximale (au sens d'une norme L2 entre les distributions) à partir d'une même configuration initiale. En deux dimensions, le phénomène est identique. Nous montrons en Fig.~\ref{fig:lyapounov} une estimation basique des exposants de Lyaponouv à partir d'une configuration initiale sensible.
+L'experience menée par \cite{raimbault2018calibration} sur une version simplifiée à une dimension du modèle montre que les distributions semi-stationnaires de population peuvent être à distance maximale (au sens d'une norme L2 entre les distributions) à partir d'une même configuration initiale. En deux dimensions, le phénomène est identique. Nous montrons en Fig.~\ref{fig:lyapounov} une estimation basique des exposants de Lyaponouv à partir d'une configuration initiale particulièrement sensible, constituée de 4 centres initiaux de taille équivalente
 
 % exp setup : 4 centers exponential mixture ?
 
@@ -206,21 +219,24 @@ Le modèle RBD~\citep{raimbault2014hybrid} couple de manière simple croissance 
 %  - fixed distrib of field centers weight values ; repetitions with varying positions.
 %  -> indicators : optimal number of niches ? "modularity" of these ? [idea : construct neighborhood network, weight = correlation, then modularity detection ?)
 
+Distance entre partitions
+\cite{porumbel2011efficient} \cite{day1981complexity} \cite{gusfield2002partition} \cite{rossi2011partition}
 
 % version corr network
+% -> not done either - does not work well
 
-Les niches territoriales sont détectées de la façon suivante: 
-\begin{enumerate}
-	\item Un réseau support est créé, avec des noeuds sur une grille de taille fixée ($k = 5$) et une connexion aux 8 plus proches voisins.
-	\item Une distance entre chaque couple de noeud voisin est calculée par
-	\[
-	d_{ij} = \sqrt{\sum_k (\tau_M^{(k)}(i) - \tau_M^{(k)}(j))^2}
-	\]
-	\item Le poids des liens du réseau est donné par $w_{ij} = \frac{1}{1 + d_{ij}^p}$
-	\item Une détection de communautés (algorithme de Louvain) est effectuée dans le réseau pondéré correspondant
-	\item La distance entre la partition obtenue et la partition correspondant à la non-stationnarité est calculée par diversité moyenne des profils de communautés en termes d'appartenance aux communautés de la partition opposée.
-\end{enumerate}
-
+%Les niches territoriales sont détectées de la façon suivante: 
+%\begin{enumerate}
+%	\item Un réseau support est créé, avec des noeuds sur une grille de taille fixée ($k = 5$) et une connexion aux 8 plus proches voisins.
+%	\item Une distance entre chaque couple de noeud voisin est calculée par
+%	\[
+%	d_{ij} = \sqrt{\sum_k (\tau_M^{(k)}(i) - \tau_M^{(k)}(j))^2}
+%	\]
+%	\item Le poids des liens du réseau est donné par $w_{ij} = \frac{1}{1 + d_{ij}^p}$
+%	\item Une détection de communautés (algorithme de Louvain) est effectuée dans le réseau pondéré correspondant
+%	\item La distance entre la partition obtenue et la partition correspondant à la non-stationnarité est calculée par diversité moyenne des profils de communautés en termes d'appartenance aux communautés de la partition opposée.
+%\end{enumerate}
+%
 
 
 % version GA
@@ -232,20 +248,6 @@ Les niches territoriales sont détectées de la façon suivante:
 %où la fonction $f$ donne un objectif en termes d'estimation de la corrélation (par exemple corrélation absolue moyenne $ - 1/N \sum_i \left| \rho_i \right|$, corrélation maximale $ - \max \left| \rho_i \right|$, niveau d'estimation en termes de taille des intervalles de confiance).
 
 %En pratique, le problème est résolu de manière heuristique par algorithme génétique, à nombre fixé de centres variant dans $3\leq N \leq 10$ (sachant que le champ non-stationnaire est généré par un nombre fixe de centres $N=6$).
-
-
-
-%%%%%%%%%%%%%%%%
-\section{Complexité et émergence}
-%%%%%%%%%%%%%%%%
-
-
-
-Notre dernière entrée s'intéresse à la complexité en tant qu'émergence faible de structures et autonomie des niveaux supérieurs~\citep{bedau2002downward}, de manière théorique. Nous rappelons le caractère intrinsèquement multi-échelle des systèmes territoriaux, qui se manifeste par exemple dans l'approche des villes comme systèmes au sein de systèmes de villes (\cite{pumain1997pour} enrichissant \cite{berry1964cities}). Par ailleurs, il existe une nécessité actuelle de production de modèles spatiaux l'intégrant effectivement~\citep{rozenblat2018conclusion}, dans le but de modèles effectivement opérationnels.
-
-La difficulté d'endogénéisation de niveau supérieurs autonomes peut par exemple être illustrée par~\cite{lenechet:halshs-01272236} qui propose un modèle de co-évolution entre transport et usage du sol à l'échelle métropolitaine intégrant une structure de gouvernance endogène pour le réseau de transport. Simulant les négociations entre acteurs locaux du transport, certains régimes conduisent à l'émergence d'un niveau intermédiaire de gouvernance issu de la collaboration entre acteurs voisins. Les trois niveaux décisionnels sont alors bien autonomes ontologiquement mais aussi en termes de dynamiques. L'émergence de la collaboration est finement liée à la structure spatiale, puisque les acteurs incluent les motifs d'accessibilité dans leur processus de prise de décision.
-
-Des systèmes de complexité ontologique moindre présentent aussi un rôle crucial de l'émergence faible. L'état local d'un flux de trafic est en partie conséquence de l'état global du système, en particulier lorsque des motifs de congestion conséquents sont observables à l'échelle macroscopique. Dans ce cas, les motifs spatio-temporels sont encore cruciaux dans le processus d'émergence \citep{treiber2010three}.
 
 
 

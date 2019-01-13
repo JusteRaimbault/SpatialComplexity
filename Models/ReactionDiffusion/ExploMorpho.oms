@@ -1,0 +1,65 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
+logger.level("FINE")
+
+// Parameters
+val diffusion = Val[Double]
+val diffusionsteps = Val[Double]
+val alphalocalization = Val[Double]
+val growthrate = Val[Double]
+val population = Val[Double]
+val replication = Val[Int]
+
+// Reporters
+val morans = Val[Array[Double]]
+val distances = Val[Array[Double]]
+val entropies = Val[Array[Double]]
+val slopes = Val[Array[Double]]
+val rsquared = Val[Array[Double]]
+
+val model =
+  ScalaTask(
+    """
+      | import density._
+      | val gen = new PADGeneratorLauncher
+      | gen.main(100,input.population,input.diffusion,input.diffusionsteps,input.growthrate,input.alphalocalization,input.replication,5)
+      | val morans = gen.moran
+      | val distances = gen.distance
+      | val entropies = gen.entropy
+      | val slopes = gen.slope
+      | val rsquared = gen.rsquared
+    """.stripMargin
+  ) set (
+    //plugins += pluginsOf(density.TrajCompLauncher),
+    inputs += (diffusion,diffusionsteps,alphalocalization,growthrate,population,replication,id),
+    outputs += (diffusion,diffusionsteps,alphalocalization,growthrate,population,replication,id),
+    outputs += (morans,distances,entropies,slopes,rsquared)
+)
+
+
+val purpose = "MORPHO_TEST"
+//val purpose = "GRID"
+
+val env = LocalEnvironment(1)
+//val env = EGIEnvironment("vo.complex-systems.eu")
+
+val h = AppendToCSVFileHook("exploration/"+((new SimpleDateFormat("yyyyMMdd_HHmm")).format(new Date()))+"_"+purpose+".csv")set (
+  arraysOnSingleRow := true
+)
+
+val exploration = DirectSampling (
+  evaluation = (model on env hook h),
+  sampling = LHS (
+    1,
+    diffusion in Range(0.0, 0.5),
+    alphalocalization in Range(0.5,2.5),
+    //growthrate in Range(500.0,30000.0),
+    //population in Range(10000.0,1000000.0),
+    growthrate in Range(500.0,1000.0),
+    population in Range(10000.0,100000.0),
+    diffusionsteps in Range(1.0,5.0)
+  ) x (replication in UniformDistribution[Int]() take 1)
+)
+
+exploration

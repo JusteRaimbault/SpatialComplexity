@@ -126,7 +126,7 @@ to extreme-patch-params
    ;if p-distance-to-roads-coefficient + p-distance-to-center-coefficient + p-density-coefficient + p-distance-to-activities-coefficient = 0 [
    ; let r random 4 if r = 0 [set p-distance-to-roads-coefficient 1] if r = 1 [set p-distance-to-center-coefficient 1] if r = 2 [set p-density-coefficient 1] if r = 3 [set p-distance-to-activities-coefficient 1]
    ;]
-  if p-distance-to-roads-coefficient + p-distance-to-center-coefficient + p-density-coefficient [
+  if p-distance-to-roads-coefficient + p-distance-to-center-coefficient + p-density-coefficient = 0 [
     let r random 3 if r = 0 [set p-distance-to-roads-coefficient 1] if r = 1 [set p-distance-to-center-coefficient 1] if r = 2 [set p-density-coefficient 1]
   ]
   
