@@ -226,10 +226,14 @@ globals[
   global:profile-cluster-number
   global:clustering-bootstraps
 
+  ;;
+  ; clustering measures
   partition-distances
   null-partition-distances
   clusters-radius
   null-clusters-radius
+  clusters-overlaps
+  null-clusters-overlaps
 
 
   ; economic abm

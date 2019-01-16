@@ -41,7 +41,7 @@ to correlations:setup-correlation-links
   
   ask corr-nodes [
     create-corr-links-with other corr-nodes with [not corr-link-neighbor? myself and distance myself < corrnw-step * (sqrt 2 + 0.1)][
-      let dist correlations:dist [corr-node:lagged-corr-profile] of end1 [corr-node:lagged-corr-profile] of end2
+      let dist correlations:dist [corr-node:lagged-corr-profile] of end1 [corr-node:lagged-corr-profile] of end2 "taumax"
       set corr-link:weight 1 / ( 1 + dist ^ p-corr-dist)
       ;set corr-link:weight exp (- dist)
       set thickness corr-link:weight
@@ -52,14 +52,18 @@ to correlations:setup-correlation-links
   ;ask corr-links with [corr-link:weight < 0.1] [die]
 end
 
-to-report correlations:dist [p1 p2]
+;;
+;
+to-report correlations:dist [p1 p2 mode]
   let res 0
   (foreach p1 p2 [
     [p1t p2t] -> 
-      ; l2 dist : too much noise ?
-      ;let d list:minus p1t p2t
-      ;set res res + list:scalar-product d d
     
+    ifelse mode = "l2" [
+      ; l2 dist : too much noise ?
+      let d list:minus p1t p2t
+      set res res + list:scalar-product d d
+    ][
       ; -> use argmax rho_tau
       let i1m list:max-index (map abs (sublist p1t 0 (taumax + 1))) let i1p list:max-index (map abs (sublist p1t taumax (2 * taumax + 1)))
       let i2m list:max-index (map abs (sublist p2t 0 (taumax + 1))) let i2p list:max-index (map abs (sublist p2t taumax (2 * taumax + 1)))
@@ -68,6 +72,7 @@ to-report correlations:dist [p1 p2]
     
       
       set res res + ((i1m - i2m) ^ 2) + ((i1p - i2p) ^ 2)
+    ]
    ])
   report sqrt res
 end
@@ -282,7 +287,7 @@ end
 ;;
 ; relative spatial radius (average distance to centroid normalized by same measure for the corresponding circle)
 to-report correlations:average-clusters-radius
-  let clustnums1 remove-duplicates [corr-node:community] of corr-nodes let clustnums2 remove-duplicates [corr-node:closest-center] of corr-nodes
+  let clustnums1 remove-duplicates [corr-node:community] of corr-nodes
   let clusters1 map [k -> corr-nodes with [corr-node:community = k]] clustnums1 
   let centroids1 correlations:centroids clusters1
   let reldists []
@@ -295,27 +300,95 @@ to-report correlations:average-clusters-radius
 end
 
 
-to-report correlations:bootstrap-clustering-centroid-distance [nbootstrap]
+;;
+; overlap of the square envelope with
+to-report correlations:average-cluster-overlap
+  let clustnums remove-duplicates [corr-node:community] of corr-nodes
+  let clusters map [k -> corr-nodes with [corr-node:community = k]] clustnums
+  let res []
+  (foreach clusters clustnums [
+    [cluster k] ->
+     ; without convex hull primitive we take a square envelope - the effect should be cancelled out on repetitions ? 
+     let xmin min [xcor] of cluster let xmax max [xcor] of cluster let ymin min [ycor] of cluster let ymax max [ycor] of cluster
+    let nodes-in-envelope corr-nodes with [xcor <= xmax and xcor >= xmin and ycor <= ymax and ycor >= ymin]
+    set res lput (count nodes-in-envelope with [corr-node:community != k] / count nodes-in-envelope) res
+  ])
+  report mean res
+end
+
+
+;;
+; average spatial distance between centroids
+;  - should be maximized
+to-report correlations:average-centroids-distance
+  let clustnums remove-duplicates [corr-node:community] of corr-nodes
+  let clusters map [k -> corr-nodes with [corr-node:community = k]] clustnums
+  let centroids correlations:centroids clusters
+  let res []
+  foreach centroids [c1 ->
+    foreach centroids [c2 ->
+      set res lput sqrt ((first c1 - first c2)^ 2 + (last c1 - last c2)^ 2) res
+    ]
+  ]
+  report mean res
+end
+
+
+;;
+; average profile distance between corr-node closest to centroids
+to-report correlations:average-centroid-profiles-distance
+  ;let dist correlations:dist [corr-node:lagged-corr-profile] of end1 [corr-node:lagged-corr-profile] of end2
+  let clustnums remove-duplicates [corr-node:community] of corr-nodes
+  let clusters map [k -> corr-nodes with [corr-node:community = k]] clustnums
+  let centroids correlations:centroids clusters
+  let taumaxres []
+  let euclres []
+  foreach centroids [c1 ->
+    let corrnode1 one-of corr-nodes with-min [sqrt ((xcor - first c1)^ 2 + (ycor - last c1)^ 2)]
+    foreach centroids [c2 ->
+      let corrnode2 one-of corr-nodes with-min [sqrt ((xcor - first c2)^ 2 + (ycor - last c2)^ 2)]
+      set taumaxres lput (correlations:dist [corr-node:lagged-corr-profile] of corrnode1 [corr-node:lagged-corr-profile] of corrnode2 "taumax") taumaxres
+      set euclres lput (correlations:dist [corr-node:lagged-corr-profile] of corrnode1 [corr-node:lagged-corr-profile] of corrnode2 "l2") euclres
+    ] 
+  ]
+  report (list (mean taumaxres) (mean euclres))
+end
+
+
+;;
+to-report correlations:within-ss
+  ; TODO
+end
+
+
+to-report correlations:bootstrap-measures [nbootstrap]
   
   let dists []
   let nulldists []
   let radiuses []
   let nullradiuses []
-  
+  let overlaps []
+  let nulloverlaps []
+  let clustdist []
+  let nullclustdist []
+
   repeat nbootstrap [
     correlations:profile-clustering
     set dists lput correlations:centroid-distance dists
     set radiuses lput correlations:average-clusters-radius radiuses
-    ;[? -> [corr-node:community] of ?] [? -> [corr-node:closest-center] of ?]) res
+    set overlaps lput correlations:average-cluster-overlap overlaps
+    set clustdist lput correlations:average-centroids-distance clustdist
     
     ; shuffle clusters
     let remclusts shuffle [corr-node:community] of corr-nodes
     ask corr-nodes [set corr-node:community first remclusts set remclusts but-first remclusts]
     set nulldists lput correlations:centroid-distance nulldists
     set nullradiuses lput correlations:average-clusters-radius nullradiuses
+    set nulloverlaps lput correlations:average-cluster-overlap nulloverlaps
+    set nullclustdist lput correlations:average-centroids-distance nullclustdist
   ]
   
-  report (list dists nulldists radiuses nullradiuses)
+  report (list dists nulldists radiuses nullradiuses overlaps nulloverlaps)
 end
 
 
@@ -339,7 +412,7 @@ to correlations:test-clustering
     
     ;let dist correlations:clustering-nodes-similarity 100
     ;let dists map [? -> ? * k] correlations:bootstrap-clustering-centroid-distance 1000
-    let dists correlations:bootstrap-clustering-centroid-distance 1000
+    let dists correlations:bootstrap-measures 1000
     
     ;show (word "avg-part-dist = " (min res))
     ;show (word "avg-part-dist = " dist)

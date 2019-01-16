@@ -45,22 +45,41 @@ seg<-segmented(lm(data=d,log(value)~t))
 slope(seg)$t[1,1]
 summary(seg)$adj.r.squared
 
-adjr2=c();lambda1=c();lambda2=c();ids=sres$id[sres$count>500]
-for(id in ids){
+adjr2=c();lambda1=c();lambda2=c();ids=sres$id[sres$count>500];breaks=c()
+#for(id in ids){
   # this should be parallelized when will have more runs
+library(doParallel)
+cl <- makeCluster(20,outfile='loggwr')
+registerDoParallel(cl)
+
+res <- foreach(i=1:length(ids)) %dopar% {
+  library(segmented)
+  id = ids[i]
   show(id)
   d=tres[tres$id==id&tres$value>0,]
   seg<-segmented(lm(data=d,log(value)~t))
-  lambda1=append(lambda1,slope(seg)$t[1,1]);lambda2=append(lambda2,slope(seg)$t[2,1])
-  adjr2=append(adjr2,summary(seg)$adj.r.squared)
+  #lambda1=append(lambda1,slope(seg)$t[1,1]);lambda2=append(lambda2,slope(seg)$t[2,1])
+  #breaks=append(breaks,seg$psi[2])
+  #adjr2=append(adjr2,summary(seg)$adj.r.squared)
+  return(c(lambda1=slope(seg)$t[1,1],lambda2=slope(seg)$t[2,1],breaks=seg$psi[2],adjr2=summary(seg)$adj.r.squared))
 }
 
-save(adjr2,lambda1,lambda2,ids,file=paste0(resdir,'lyapounov.RData'))
-summary(lambda1)
-summary(lambda2)
+#save(adjr2,lambda1,lambda2,ids,breaks,file=paste0(resdir,'lyapounov.RData'))
+save(res,file=paste0(resdir,'lyapounov.RData'))
+
+#summary(lambda1)
+#summary(lambda2)
 
 # ids[lambda1==max(lambda1)]
 # adjr2[lambda1==max(lambda1)]
 # ids[adjr2==min(adjr2)]
+
+#params=res%>%group_by(id)%>%summarize(alpha=mean(alphalocalization),beta=mean(diffusion),nd=mean(diffusionsteps),relgrowthrate=mean(growthrate)/mean(population),growthrate=mean(growthrate),population=mean(population))
+#rownames(params)=params$id
+
+#dd=data.frame(adjr2,lambda1,lambda2,ids,params[ids,])
+
+#summary(lm(data=dd,lambda1~alpha+beta+nd+growthrate+population+relgrowthrate))
+#summary(lm(data=dd,lambda2~alpha+beta+nd+growthrate+population+relgrowthrate))
 
 

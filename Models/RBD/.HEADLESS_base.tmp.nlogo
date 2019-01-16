@@ -228,6 +228,9 @@ globals[
 
   partition-distances
   null-partition-distances
+  clusters-radius
+  null-clusters-radius
+
 
 
   ; economic abm
