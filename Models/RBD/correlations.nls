@@ -192,7 +192,8 @@ end
 
 
 
-
+;;
+; kmeans clustering based on correlation profiles
 to correlations:profile-clustering
   ask corr-nodes [
     set corr-node:feature concatenate corr-node:lagged-corr-profile
@@ -356,28 +357,47 @@ end
 
 
 ;;
+; proportion of within cluster sum of squares
+;  NOTE : Jung's clusterer does not provide this measure, can not get it out of the netlogo extension
 to-report correlations:within-ss
-  ; TODO
+  ; need cluster sizes for ponderation
+  let clustnums remove-duplicates [corr-node:community] of corr-nodes
+  let clusters map [k -> corr-nodes with [corr-node:community = k]] clustnums
+  let clustsizeslist map count clusters let clustsizes table:make (foreach clustnums clustsizeslist [[k s] -> table:put clustsizes k s])
+  let n count corr-nodes
+  let withinss 0 let totss 0
+  ask corr-nodes [
+    ask other corr-nodes [
+      let d correlations:dist corr-node:lagged-corr-profile [corr-node:lagged-corr-profile] of myself "l2"
+      set totss totss + d
+      if corr-node:community = [corr-node:community] of myself [let w n / (2 *(table:get clustsizes corr-node:community)) set withinss withinss + w * d]
+    ] 
+  ]
+  report withinss / totss
 end
 
 
+;;
+; bootstrap the different measures
+;  FIXME if number of measures continues increasing, should be passed as an arg and return a map
 to-report correlations:bootstrap-measures [nbootstrap]
   
-  let dists []
-  let nulldists []
-  let radiuses []
-  let nullradiuses []
-  let overlaps []
-  let nulloverlaps []
-  let clustdist []
-  let nullclustdist []
-
+  let dists [] let nulldists []
+  let radiuses [] let nullradiuses []
+  let overlaps [] let nulloverlaps []
+  let clustdist [] let nullclustdist []
+  let profiledisteucl [] let nullprofiledisteucl []
+  let profiledisttaumax [] let nullprofiledisttaumax []
+  let withinss [] let nullwithinss []
+  
   repeat nbootstrap [
     correlations:profile-clustering
     set dists lput correlations:centroid-distance dists
     set radiuses lput correlations:average-clusters-radius radiuses
     set overlaps lput correlations:average-cluster-overlap overlaps
     set clustdist lput correlations:average-centroids-distance clustdist
+    let profiledist correlations:average-centroid-profiles-distance set profiledisttaumax lput (first profiledist) profiledisttaumax set profiledisteucl lput (last profiledist) profiledisteucl
+    set withinss lput correlations:within-ss withinss
     
     ; shuffle clusters
     let remclusts shuffle [corr-node:community] of corr-nodes
@@ -386,9 +406,12 @@ to-report correlations:bootstrap-measures [nbootstrap]
     set nullradiuses lput correlations:average-clusters-radius nullradiuses
     set nulloverlaps lput correlations:average-cluster-overlap nulloverlaps
     set nullclustdist lput correlations:average-centroids-distance nullclustdist
+    let nullprofiledist correlations:average-centroid-profiles-distance set nullprofiledisttaumax lput (first nullprofiledist) nullprofiledisttaumax set nullprofiledisteucl lput (last nullprofiledist) nullprofiledisteucl
+    set nullwithinss lput correlations:within-ss nullwithinss
+    
   ]
   
-  report (list dists nulldists radiuses nullradiuses overlaps nulloverlaps)
+  report (list dists nulldists radiuses nullradiuses overlaps nulloverlaps profiledisttaumax nullprofiledisttaumax profiledisteucl nullprofiledisteucl withinss nullwithinss)
 end
 
 

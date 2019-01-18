@@ -21,6 +21,12 @@ val partitionDistances = Val[Array[Double]]
 val nullPartitionDistances = Val[Array[Double]]
 val clustersRadius = Val[Array[Double]]
 val nullClustersRadius = Val[Array[Double]]
+val profileDistTaumax = Val[Array[Double]]
+val nullProfileDistTaumax = Val[Array[Double]]
+val profileDistEucl = Val[Array[Double]]
+val nullProfileDistEucl = Val[Array[Double]]
+val clustersWithinss = Val[Array[Double]]
+val nullClustersWithinss = Val[Array[Double]]
 
 val id = Val[Int]
 val replication = Val[Int]
@@ -40,23 +46,29 @@ NetLogo6Task(workDirectory / "HEADLESS_base.nlogo",cmds,embedWorkspace=true) set
     outputs += partitionDistances mapped "partition-distances",
     outputs += nullPartitionDistances mapped "null-partition-distances",
     outputs += clustersRadius mapped "clusters-radius",
-    outputs += nullClustersRadius mapped "null-clusters-radius"
+    outputs += nullClustersRadius mapped "null-clusters-radius",
+    outputs += profileDistTaumax mapped "profiledist-taumax",
+    outputs += nullProfileDistTaumax mapped "null-profiledist-taumax",
+    outputs += profileDistEucl mapped "profiledist-eucl",
+    outputs += nullProfileDistEucl mapped "null-profiledist-eucl",
+    outputs += clustersWithinss mapped "clusters-withinss",
+    outputs += nullClustersWithinss mapped "null-clusters-withinss"
 )
 
-//val purpose = "TEST"
-val purpose = "GRID"
+val purpose = "TEST"
+//val purpose = "GRID"
 
 val env = LocalEnvironment(1)
-//val env = DIRACEnvironment("vo.complex-systems.eu")
+//val env = EGIEnvironment("vo.complex-systems.eu")
 
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmm")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
 val exploration = DirectSampling(
-  //evaluation = (model on env hook indics_hook),
-  evaluation = (model on env by 10 hook indics_hook),
-  sampling = ((
+  evaluation = (model on env hook indics_hook),
+  //evaluation = (model on env by 2 hook indics_hook),
+  /*sampling = ((
     (centerNumber in (3 to 8 by 1)) x
     (
       ((((weightDensity in Seq(0.0,1.0))x(weightCenter in Seq(0.0,1.0))x(weightRoad in Seq(0.0,1.0))) filter ("weightDensity + weightCenter + weightRoad > 0")) x (paramMode is "uniform"))
@@ -64,8 +76,8 @@ val exploration = DirectSampling(
     )
     //x (pCorrDist in Seq(1.0,2.0,5.0))
   ) withIndex id)
-    x (replication in UniformDistribution[Int]() take 50)
-  //sampling = (((centerNumber is 4) x (paramMode is "closest-center") x (weightDensity is 1.0) x (weightCenter is 1.0) x (weightRoad is 1.0)) withIndex id) x (replication is 0)
+    x (replication in UniformDistribution[Int]() take 100)*/
+  sampling = (((centerNumber is 4) x (paramMode is "closest-center") x (weightDensity is 1.0) x (weightCenter is 1.0) x (weightRoad is 1.0)) withIndex id) x (replication is 0)
 )
 
 exploration

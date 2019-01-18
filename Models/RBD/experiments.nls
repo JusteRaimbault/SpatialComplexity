@@ -102,12 +102,21 @@ to run-experiment
   ;correlations:communities
   ;let res correlations:bootstrapped-partition-distance
   
-  let dists correlations:bootstrap-clustering-centroid-distance global:clustering-bootstraps
+  let dists correlations:bootstrap-measures global:clustering-bootstraps
   
+  ; (list dists nulldists radiuses nullradiuses overlaps nulloverlaps profiledisttaumax nullprofiledisttaumax profiledisteucl nullprofiledisteucl withinss nullwithinss)
   set partition-distances item 0 dists
   set null-partition-distances item 1 dists
   set clusters-radius item 2 dists
   set null-clusters-radius item 3 dists
+  set clusters-overlaps item 4 dists
+  set null-clusters-overlaps item 5 dists
+  set profiledist-taumax item 6 dists
+  set null-profiledist-taumax item 7 dists
+  set profiledist-eucl item 8 dists
+  set null-profiledist-eucl item 9 dists
+  set clusters-withinss item 10 dists
+  set null-clusters-withinss item 11 dists
   
 end
 
@@ -119,7 +128,8 @@ to test-experiment
   ;setup-headless 1.0 1.0 1.0 "linear-gradient" 10 30 1.0 -654654258
   
   ;setup-headless 1.0 1.0 1.0 "linear-gradient" 4 30 1.0 654258
-  setup-headless 1.0 1.0 1.0 "uniform" 4 30 1.0 654258
+  ;setup-headless 1.0 1.0 1.0 "uniform" 4 30 1.0 654258
+  setup-headless 1.0 1.0 0.0 "uniform" 6 30 1.0 654258
   
   run-experiment
   ;show correlations:bootstrapped-partition-distance

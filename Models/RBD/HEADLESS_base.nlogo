@@ -234,6 +234,12 @@ globals[
   null-clusters-radius
   clusters-overlaps
   null-clusters-overlaps
+  profiledist-taumax
+  null-profiledist-taumax
+  profiledist-eucl
+  null-profiledist-eucl
+  clusters-withinss
+  null-clusters-withinss
 
 
   ; economic abm
