@@ -198,6 +198,9 @@ to correlations:profile-clustering
   ask corr-nodes [
     set corr-node:feature concatenate corr-node:lagged-corr-profile
   ]
+  ; TODO do not use in bootstrap -
+  ;let rs random 1000 show (word "random seed for clustering " rs)
+  ;random-seed rs
   let clusters kmeans:cluster-by-feature corr-nodes global:profile-cluster-number 1000 0.01 "corr-node:feature"
   let colors sublist base-colors 0 global:profile-cluster-number
   (foreach clusters colors (seq 1 global:profile-cluster-number 1) [
@@ -207,6 +210,7 @@ to correlations:profile-clustering
    ] 
   ])
   ;ask patches [set pcolor [corr-node:closest-center] of one-of corr-nodes with-min [distance myself] * 10 + 5]
+  ask patches [set pcolor [corr-node:community] of one-of corr-nodes with-min [distance myself] * 10 + 55]
 end
 
 

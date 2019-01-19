@@ -86,8 +86,15 @@ end
 
 ;;
 ;
-to run-experiment
+to experiment
   
+  run-model
+  
+  compute-measures
+  
+end
+
+to run-model
   repeat max-ticks [
     show (word "run : " ticks)
     go 
@@ -98,9 +105,9 @@ to run-experiment
   ;  ["eval-density" "spatial-autocorrelation-index" "eval-speed" "eval-activities" "eval-economic"]
   
   correlations:construct-correlation-network
-  
-  ;correlations:communities
-  ;let res correlations:bootstrapped-partition-distance
+end
+
+to compute-measures
   
   let dists correlations:bootstrap-measures global:clustering-bootstraps
   
@@ -117,9 +124,7 @@ to run-experiment
   set null-profiledist-eucl item 9 dists
   set clusters-withinss item 10 dists
   set null-clusters-withinss item 11 dists
-  
 end
-
 
 to test-experiment
   ;setup-headless (random-float 1) (random-float 1) (random-float 1) "closest-center" 1 40 random 1000
@@ -129,15 +134,17 @@ to test-experiment
   
   ;setup-headless 1.0 1.0 1.0 "linear-gradient" 4 30 1.0 654258
   ;setup-headless 1.0 1.0 1.0 "uniform" 4 30 1.0 654258
-  setup-headless 1.0 1.0 0.0 "uniform" 6 30 1.0 654258
+  ;setup-headless 1.0 1.0 0.0 "uniform" 6 30 1.0 654258
+  setup-headless 1.0 1.0 0.0 "closest-center" 5 30 1.0 654258
   
-  run-experiment
+  ;experiment
+  run-model
   ;show correlations:bootstrapped-partition-distance
   ;correlations:test-clustering
-  show partition-distances
-  show null-partition-distances
-  show clusters-radius
-  show null-clusters-radius
+  ;show partition-distances
+  ;show null-partition-distances
+  ;show clusters-radius
+  ;show null-clusters-radius
 end
 
 
