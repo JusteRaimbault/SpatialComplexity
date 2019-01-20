@@ -71,11 +71,11 @@
 
 
 \title{Espace et complexités des systèmes territoriaux
-\\\medskip
+\\\bigskip
 \textit{Actes des Journ{\'e}es de Rochebrune 2019}
 }
 \author{\noun{Juste Raimbault}$^{1,2,3}$
-\\\bigskip
+\bigskip\\
 $^1$ UPS CNRS 3611 ISC-PIF\\
 $^2$ CASA, UCL\\
 $^3$ UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
@@ -93,7 +93,7 @@ $^3$ UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
 
 \begin{abstract}
 	Le caractère spatialisé des systèmes territoriaux joue un rôle déterminant dans l'émergence de leurs complexités. Cette contribution vise à illustrer dans quelle mesure différents types de complexités peuvent se manifester dans des modèles de tels systèmes. Nous développons d'un point de vue théorique des arguments illustrant la complexité ontologique, au sens de la multitude et multidimensionalité de représentations possibles, puis la complexité au sens de l'émergence, c'est-à-dire la nécessité de l'existence de plusieurs niveaux autonomes. Nous proposons ensuite des expériences numériques pour explorer des propriétés de la complexité (complexité dynamique et co-évolution) au sein de deux modèles simples de morphogenèse urbaine. Nous suggérons finalement d'autres dimensions de la complexité qui pourraient être typiques des systèmes territoriaux.\\\medskip
-	\noindent\textbf{Keywords : }\textit{Complexités; Systèmes territoriaux; Morphogenèse urbaine; Co-évolution}
+	\noindent\textbf{Mots-clés : }\textit{Complexités; Systèmes territoriaux; Morphogenèse urbaine; Co-évolution}
 \end{abstract}
 
 
@@ -103,11 +103,11 @@ $^3$ UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
 \section{Introduction}
 
 
-Les systèmes territoriaux, qui peuvent être compris comme des structures socio-spatiales auto-organisées, sont une illustration typique de systèmes complexes étudiés sous de nombreux angles incluant plus ou moins l'aspect spatial de ces systèmes. Cette contribution vise à illustrer une approche de ceux-ci par la géographie urbaine, et dans quelle mesure leur complexité est intimement liée à leur caractère spatial.
+Les systèmes territoriaux, qui peuvent être compris comme des structures socio-spatiales auto-organisées \citep{pumain1997pour}, sont une illustration typique de systèmes complexes étudiés sous de nombreux angles incluant plus ou moins l'aspect spatial de ces systèmes. Notre appréhension des systèmes territoriaux se place plus particulièrement dans la lignée de la théorie évolutive des villes~\citep{pumain2018evolutionary} qui comprend les systèmes urbains comme des systèmes multi-niveaux, dans lesquels la co-évolution des multiples composants et agents détermine la dynamique de ceux-ci~\citep{raimbault2018caracterisation}. La complexité de ces systèmes est ainsi étroitement liée à leur caractère spatial, puisque leurs dynamiques sont portées par les distributions spatiales de leur entités et sous-systèmes, et que les interactions entre agents conduisant au comportement émergent sont inscrites dans l'espace.
 
-Notre appréhension des systèmes territoriaux se place plus particulièrement dans la lignée de la théorie évolutive des villes~\citep{pumain1997pour} qui comprend les systèmes urbains comme des systèmes multi-niveaux, dans lesquels la co-évolution des multiples composants et agents détermine la dynamique de ceux-ci~\citep{raimbault2018caracterisation}.
+Le concept de complexité correspond à de diverses approches et définitions, qui dépendent des domaines où elles sont introduites. Par exemple, \cite{chu2008criteria} passe en revue les approches conceptuelles et opérationnelles liée champ de la vie artificielle et montre qu'il n'existe pas de concept unifié. \cite{deffuant2015visions} développe aussi différentes visions de la complexité, allant d'une complexité proche d'une complexité computationnelle à une complexité irréductible propre aux systèmes sociaux. Un précédent travail par \cite{raimbault2018relating} s'était proposé de suggérer des ponts épistémologiques entre différentes approches et définitions de la complexité, et plus particulièrement les liens entre complexité au sens d'émergence, complexité computationnelle et complexité informationnelle. 
 
-Le concept de complexité correspond à de diverses approches et définitions, qui dépendent des domaines où elles sont introduites. Par exemple, \cite{chu2008criteria} passe en revue les approches conceptuelles et opérationnelles liée champ de la vie artificielle et montre qu'il n'existe pas de concept unifié. \cite{deffuant2015visions} développe aussi différentes visions de la complexité, allant d'une complexité proche d'une complexité computationnelle à une complexité irréductible propre aux systèmes sociaux. Un précédent travail par \cite{raimbault2018relating} s'était proposé de suggérer des ponts épistémologiques entre différentes approches et définitions de la complexité, et plus particulièrement les liens entre complexité au sens d'émergence, complexité computationnelle et complexité informationnelle. Nous tâchons ici d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux.
+Cette contribution vise à illustrer une approche de ceux-ci par la géographie urbaine, et dans quelle mesure leur complexité est intimement liée à leur caractère spatial. Nous tâchons ici d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux.
 
 La suite de cet article est organisée de la façon suivante : dans deux premières sections nous développons une approche conceptuelle de la complexité ontologique et de l'émergence au sein des systèmes territoriaux. Nous présentons ensuite des résultats de simulation d'un modèle de morphogenèse urbaine exhibant des propriétés typiques de la complexité dynamique. Une autre expérience permet ensuite de montrer le lien entre complexité et co-évolution. Nous discutons finalement les implications des ces résultats et des développements possibles.
 
@@ -210,7 +210,7 @@ L'experience menée par \cite{raimbault2018calibration} sur une version simplifi
 %%%%%%%%%%%%%
 \begin{figure}
 	\includegraphics[width=0.49\linewidth]{figures/configdist_boxplot_id3642.png}	\includegraphics[width=0.49\linewidth]{figures/configdist_boxplot_id3784.png}	\includegraphics[width=0.49\linewidth]{figures/lambda1_alpha_colbeta.png}	\includegraphics[width=0.49\linewidth]{figures/lambda2_alpha_colrelgrowthrate.png}
-	\caption{}
+	\caption{\textbf{Estimation des exposants de Lyapounov locaux pour le modèle de Réaction-diffusion.}}
 	\label{fig:lyapounov}
 \end{figure}
 %%%%%%%%%%%%%
@@ -221,8 +221,9 @@ Par ailleurs, à partir de la même configuration initiale, nous illustrons les 
 
 %%%%%%%%%%%%%
 \begin{figure}
-	
-	\caption{}
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/trajs_moran-dist_seed8578.png}
+	\caption{\textbf{Trajectoires temporelles des indicateurs morphologiques.}}
 	\label{fig:morphotraj}
 \end{figure}
 %%%%%%%%%%%%%
@@ -267,7 +268,10 @@ Afin de quantifier la classification, une solution pourrait être d'étudier une
 %%%%%%%%%%%%%%
 \begin{figure}
 	\includegraphics[width=0.49\textwidth]{figures/ex_0_tf30.png}
-	\includegraphics[width=0.49\textwidth]{figures/ex_0_tf30_rsclustering321.png}	\caption{\textbf{Niches spatiales de co-évolution dans le modèle RBD.}\textit{(Haut gauche)} Configuration générée avec $N_C = 5$ centres et des paramètres non-stationnaires par centre le plus proche, tels que, dans un ordre de coordonnée verticale décroissante, les poids pour chaque centre sont $(w_d,w_r,w_c) = (0,1,0) ; (0,0,1) ; (1,0,1) ; (1,0,1) ; (0,0,1)$ ; \textit{(Haut droite)} Exemple de réalisation correspondante pour la classification par k-means, la couleur de cellule donnant le cluster.}
+	\includegraphics[width=0.49\textwidth]{figures/ex_0_tf30_rsclustering321.png}\\\bigskip
+	\includegraphics[width=0.49\textwidth]{figures/radius.png}
+	\includegraphics[width=0.49\textwidth]{figures/profiledisteucl.png}\\
+	\includegraphics[width=0.49\textwidth]{figures/distance.png}	\includegraphics[width=0.49\textwidth]{figures/withinss.png}	\caption{\textbf{Niches spatiales de co-évolution dans le modèle RBD.}\textit{(Haut gauche)} Configuration générée avec $N_C = 5$ centres et des paramètres non-stationnaires par centre le plus proche, tels que, dans un ordre de coordonnée verticale décroissante, les poids pour chaque centre sont $(w_d,w_r,w_c) = (0,1,0) ; (0,0,1) ; (1,0,1) ; (1,0,1) ; (0,0,1)$ ; \textit{(Haut droite)} Exemple de réalisation correspondante pour la classification par k-means, la couleur de cellule donnant le cluster. ; \textit{(Milieu gauche)} Rayon normalisé moyen des clusters, pour chaque mode et configuration de paramètres (couleur), ainsi que pour le modèle nul de cluster aléatoire (lignes pointillées) ; \textit{(Milieu droit)} Distance moyenne entre les profils de corrélations retardées pour les centroïdes des clusters ; \textit{(Bas gauche)} Distance moyenne des centroïdes aux centres ; \textit{(Bas droite)} Variance intra-cluster.}
 \end{figure}
 %%%%%%%%%%%%%%
 

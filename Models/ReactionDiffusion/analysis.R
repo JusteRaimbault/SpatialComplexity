@@ -6,7 +6,7 @@ library(ggplot2)
 library(reshape2)
 library(segmented)
 
-#source(paste0(Sys.getenv('CS_HOME'),'/Organisation/Models/Utils/R/plots.R'))
+source(paste0(Sys.getenv('CS_HOME'),'/Organisation/Models/Utils/R/plots.R'))
 
 ###
 ## 1) Liapounov configurations
@@ -29,7 +29,7 @@ tres = melt(data=res,id.vars=c("growthrate","population","replication","alphaloc
 tres$t=as.numeric(substring(as.character(tres$variable),first=10))
 
 #id=643,694,686,1022,801,3784,3692,3642
-id=3642
+id=3692
 d=tres[tres$id==id&tres$value>0,]
 
 tstep=1
@@ -112,7 +112,79 @@ experiment='20190117_1029_MORPHO_GRID'
 #res<-as.tbl(read.csv(paste0('exploration/',experiment,'.csv')))
 resdir=paste0(Sys.getenv('CS_HOME'),'/SpatialComplexity/Results/ReactionDiffusion/',experiment,'/');dir.create(resdir)
 
-res<-scan(file=paste0('exploration/',experiment,'.csv'))
+tstep=5
+
+#header<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=32,what='character',sep=",")
+res<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=-1,skip = 1,what='character')
+res<-sapply(res,function(s){
+  splited = strsplit(s,",")[[1]]
+  tsteps = (length(splited)-7)/5
+  data.frame(alpha=as.numeric(rep(splited[1],tsteps)),
+             beta=as.numeric(rep(splited[2],tsteps)),
+             nd=as.numeric(rep(splited[3],tsteps)),
+             distance=as.numeric(splited[4:(tsteps+3)]),
+             entropy=as.numeric(splited[(tsteps+4):(2*tsteps+3)]),
+             ng=as.numeric(rep(splited[2*tsteps+4],tsteps)),
+             id=as.numeric(rep(splited[2*tsteps+5],tsteps)),
+             moran=as.numeric(splited[(2*tsteps+6):(3*tsteps+5)]),
+             pmax=as.numeric(rep(splited[3*tsteps+6],tsteps)),
+             replication=as.numeric(rep(splited[3*tsteps+7],tsteps)),
+             rsquared=as.numeric(splited[(3*tsteps+8):(4*tsteps+7)]),
+             slope=as.numeric(splited[(4*tsteps+8):(5*tsteps+7)]),
+             t=(0:(tsteps-1))*tstep
+             )
+})
+
+sres=as.tbl(data.frame(alpha=unlist(res[seq(1,length(res),13)]),
+                       beta=unlist(res[seq(2,length(res),13)]),
+                       nd=unlist(res[seq(3,length(res),13)]),
+                       distance=unlist(res[seq(4,length(res),13)]),
+                       entropy=unlist(res[seq(5,length(res),13)]),
+                       ng=unlist(res[seq(6,length(res),13)]),
+                       id=unlist(res[seq(7,length(res),13)]),
+                       moran=unlist(res[seq(8,length(res),13)]),
+                       pmax=unlist(res[seq(9,length(res),13)]),
+                       replication=unlist(res[seq(10,length(res),13)]),
+                       rsquared=unlist(res[seq(11,length(res),13)]),
+                       slope=unlist(res[seq(12,length(res),13)]),
+                       t=unlist(res[seq(13,length(res),13)])
+                       ))
+
+#save(sres,file=paste0('exploration/',experiment,'.RData'))
+load(paste0('exploration/',experiment,'.RData'))
+
+ampl = sres%>%group_by(id,t)%>%summarize(dmoran=max(moran)-min(moran),dentropy=max(entropy)-min(entropy),dslope=max(slope)-min(slope),ddistance=max(distance)-min(distance))
+ampl[ampl$dentropy==max(ampl$dentropy),]
+
+# test some examples of trajectories
+
+#id=unique(sres$id)[1]
+#id=unique(sres$id)[1:5]
+id=669
+#replications=unique(sres$replication)[1:10]
+replications=unique(sres$replication)
+
+
+d=sres[sres$id%in%id,]
+#replications=unique(d$replication)[1:10]
+#d=d[d$replication%in%replications,]
+
+g=ggplot(d,aes(x=moran,y=entropy,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+
+#s=sample.int(10000,1);show(s)
+s=8578
+set.seed(s)
+g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
+
+
+
+
+
+
+
+
 
 
 
