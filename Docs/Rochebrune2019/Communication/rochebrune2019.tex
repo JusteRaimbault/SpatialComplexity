@@ -1,0 +1,559 @@
+\documentclass[english,11pt,usenames,dvipsnames]{beamer}
+
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Proba}{\mathbb{P}}
+
+\newcommand{\Covb}[2]{\ensuremath{\Cov\!\left[#1,#2\right]}}
+\newcommand{\Eb}[1]{\ensuremath{\E\!\left[#1\right]}}
+\newcommand{\Pb}[1]{\ensuremath{\Proba\!\left[#1\right]}}
+\newcommand{\Varb}[1]{\ensuremath{\Var\!\left[#1\right]}}
+
+% norm
+\newcommand{\norm}[1]{\| #1 \|}
+
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
+
+
+
+
+
+\usepackage{mathptmx,amsmath,amssymb,graphicx,bibentry,bbm,babel,ragged2e}
+
+\makeatletter
+
+\newcommand{\noun}[1]{\textsc{#1}}
+\newcommand{\jitem}[1]{\item \begin{justify} #1 \end{justify} \vfill{}}
+\newcommand{\sframe}[2]{\frame{\frametitle{#1} #2}}
+
+\newenvironment{centercolumns}{\begin{columns}[c]}{\end{columns}}
+%\newenvironment{jitem}{\begin{justify}\begin{itemize}}{\end{itemize}\end{justify}}
+
+\usetheme{Warsaw}
+\setbeamertemplate{footline}[text line]{}
+\setbeamercolor{structure}{fg=purple!50!blue, bg=purple!50!blue}
+
+\setbeamersize{text margin left=15pt,text margin right=15pt}
+
+\setbeamercovered{transparent}
+
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{}
+
+\@ifundefined{showcaptionsetup}{}{%
+ \PassOptionsToPackage{caption=false}{subfig}}
+\usepackage{subfig}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{tikz}
+
+\usepackage{multirow}
+
+
+\usepackage{mdframed}
+
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{auto-pst-pdf}
+
+
+\usepackage[dvipsnames]{xcolor}
+
+
+\makeatother
+
+\begin{document}
+
+
+\title{Espace et complexités des systèmes territoriaux}
+
+\author{J.~Raimbault$^{1,2,3}$\\
+\texttt{juste.raimbault@iscpif.fr}
+}
+
+
+\institute{$^{1}$UPS CNRS 3611 ISC-PIF\\
+$^{2}$CASA, UCL\\
+$^{3}$UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
+}
+
+
+\date{Journées de Rochebrune 2019\\\smallskip
+21 janvier 2018
+}
+
+\frame{\maketitle}
+
+
+% Le caractère spatialisé des systèmes territoriaux joue un rôle déterminant dans l'émergence de leurs complexités. Cette contribution vise à illustrer dans quelle mesure différents types de complexités peuvent se manifester dans des modèles de tels systèmes. Nous développons d'un point de vue théorique des arguments illustrant la complexité ontologique, au sens de la multitude et multidimensionalité de représentations possibles, puis la complexité au sens de l'émergence, c'est-à-dire la nécessité de l'existence de plusieurs niveaux autonomes. Nous proposons ensuite des expériences numériques pour explorer des propriétés de la complexité (complexité dynamique et co-évolution) au sein de deux modèles simples de morphogenèse urbaine. Nous suggérons finalement d'autres dimensions de la complexité qui pourraient être typiques des systèmes territoriaux.
+
+
+
+\section{Introduction}
+
+% Les systèmes territoriaux, qui peuvent être compris comme des structures socio-spatiales auto-organisées \citep{pumain1997pour}, sont une illustration typique de systèmes complexes étudiés sous de nombreux angles incluant plus ou moins l'aspect spatial de ces systèmes. Notre appréhension des systèmes territoriaux se place plus particulièrement dans la lignée de la théorie évolutive des villes~\citep{pumain2018evolutionary} qui comprend les systèmes urbains comme des systèmes multi-niveaux, dans lesquels la co-évolution des multiples composants et agents détermine la dynamique de ceux-ci~\citep{raimbault2018caracterisation}. La complexité de ces systèmes est ainsi étroitement liée à leur caractère spatial, puisque leurs dynamiques sont portées par les distributions spatiales de leur entités et sous-systèmes, et que les interactions entre agents conduisant au comportement émergent sont inscrites dans l'espace.
+
+\sframe{Systèmes territoriaux}{
+ 
+ \textit{Systèmes socio-spatiaux auto-organisés}
+ 
+ \bigskip
+
+ $\rightarrow$ théorie évolutive urbaine \cite{pumain2018evolutionary}
+ 
+ \medskip
+ 
+ $\rightarrow$ co-évolution entre et au sein des sous-systèmes \cite{raimbault2018caracterisation}
+ 
+ \medskip
+
+ $\rightarrow$ interactions et dynamiques embarquées dans l'espace
+ 
+ \bigskip
+ 
+ \centering
+ 
+ \includegraphics[width=0.5\textwidth]{figures/simpop1.png}
+ \includegraphics[width=0.35\textwidth]{figures/setup_synth_1_tick100.png}
+ 
+ \medskip
+ 
+ \small \textit{Modèles Simpop1 \cite{sanders1997simpop} et SimpopNet \cite{schmitt2014modelisation}}
+ 
+ 
+}
+
+
+
+%Le concept de complexité correspond à de diverses approches et définitions, qui dépendent des domaines où elles sont introduites. Par exemple, \cite{chu2008criteria} passe en revue les approches conceptuelles et opérationnelles liée champ de la vie artificielle et montre qu'il n'existe pas de concept unifié. \cite{deffuant2015visions} développe aussi différentes visions de la complexité, allant d'une complexité proche d'une complexité computationnelle à une complexité irréductible propre aux systèmes sociaux. Un précédent travail par \cite{raimbault2018relating} s'était proposé de suggérer des ponts épistémologiques entre différentes approches et définitions de la complexité, et plus particulièrement les liens entre complexité au sens d'émergence, complexité computationnelle et complexité informationnelle. Comme le souligne \cite{batty2018defining}, les dimensions de la complexité sont potentiellement infinies et il ne peut exister d'approche universellement valide pour l'ensemble des problèmes et systèmes. Il est alors important de combiner différentes approches de la complexité pour comprendre son rôle au sein des systèmes territoriaux. 
+
+\sframe{Complexité(s)}{
+
+\textit{Quelle complexité pour les systèmes territoriaux ? \cite{batty2018defining}} 
+
+\bigskip
+
+$\rightarrow$ diversité des définitions, caractérisations, cadres de la complexité \cite{chu2008criteria}
+
+\medskip
+
+$\rightarrow$ les cauchemars du démon de Laplace ? \cite{deffuant2015visions}
+
+\medskip
+
+$\rightarrow$ complémentarité des facettes de la complexité \cite{raimbault2018relating}
+
+\bigskip\bigskip
+
+\textit{Complexité computationelle, théorie multiscalaire de l'information, chaos dynamique, criticalité auto-organisée, morphogenèse, \ldots}
+
+}
+
+
+%Cette contribution vise à illustrer une approche des systèmes territoriaux par la géographie urbaine, et dans quelle mesure leur complexité est intimement liée à leur caractère spatial. Nous tâchons ici d'illustrer les liens entre complexité et espace selon différentes vues de celle-ci, à la fois à travers des considérations théoriques mais aussi par l'exploration de modèles de simulation de systèmes territoriaux. La suite de cet article est organisée de la façon suivante : dans deux premières sections nous développons une approche conceptuelle de la complexité ontologique et de l'émergence au sein des systèmes territoriaux. Nous présentons ensuite des résultats de simulation d'un modèle de morphogenèse urbaine exhibant des propriétés typiques de la complexité dynamique. Une autre expérience permet ensuite de montrer le lien entre complexité et co-évolution. Nous discutons finalement les implications des ces résultats et des développements possibles.
+
+\sframe{Complexités et espace}{
+
+ \textit{Quel rôle de l'espace pour la complexité des systèmes territoriaux ?}
+
+\bigskip
+
+$\rightarrow$ Illustration de facettes de la complexité des systèmes territoriaux pour
+
+\begin{itemize}
+	\item complexité ontologique
+	\item émergence
+	\item complexité dynamique
+	\item co-évolution
+\end{itemize}
+
+
+}
+
+
+% Une première entrée théorique permet une entrée sur ce que nous appelons \emph{complexité ontologique}, qui a été proposée par \cite{pumain2003approche} comme la largeur des points de vue disciplinaires nécessaires pour appréhender un même objet. La multidimensionalité des systèmes territoriaux reste un enjeu principal pour leur compréhension, comme l'illustre \cite{perez2016agent} dans le cas des systèmes multi-agents. Ainsi, l'interdisciplinarité serait intrinsèque aux ``sciences urbaines'', c'est-à-dire aux différentes disciplines prenant la ville comme objet d'étude, même si celle-ci s'avère en pratique laborieuse et soumise à la contingence de l'organisation sociale des sciences \citep{dupuy2015sciences}.
+
+%Nous reprenons l'exemple de \cite{raimbault2017invisible} comme preuve-de-concept de la diversité des approches possibles dans le cas des relations entre réseaux et territoires, et suggérons des pistes de réflexion quant au rôle de l'espace dans cette complexité, comme les processus évolutifs de diversification ou de spécialisation liés aux niches spatiales. Plus précisément, \cite{raimbault2017invisible} établit une cartographie scientifique des approches de modélisation des interactions entre réseaux de transport et territoires. Par une étude de réseaux de citations, émergent des approches complémentaires, incluant par exemple la géographie quantitative, la géographie politique, l'économie urbaine, la planification, la physique. Chaque approche éclaire sur une dimension particulière du même système. L'espace permettant la différentiation des sous-systèmes, il parait d'une part naturel que certains soient plus saillants que d'autres sur les différentes instances, et d'autre part que des interrogations complémentaires cohabitent (celles-ci étant en fait endogènes aux systèmes territoriaux, puisque l'innovation et donc la recherche et la science sont un moteur important des dynamiques des systèmes urbains \citep{pumain2010theorie}).
+
+% À ce point, nous proposons une hypothèse, dont l'exploration empirique nécessiterait des analyses scientométriques poussées hors de portée de ce travail, selon laquelle une spatialisation plus élaborée serait lié à un éventail ontologique plus large. L'exemple de la \emph{New Economic Geography} et de la géographie économique illustre ce cas \cite{marchionni2004geographical}: la première approche, afin de déployer ses outils analytiques, impose un réductionnisme puissant sur l'espace (ligne ou cercle pour une grande partie des modèles) et sur les objets (agents représentatifs, homogénéité), tandis que la seconde favorisera des descriptions empiriques fidèles aux particularités géographiques. Il est difficile de dire si l'espace est plus riche parce que l'approche n'est pas réductionniste ou le contraire, qu'un espace riche augmente la portée ontologique. Prétendre un sens de causalité serait en fait contre-productif, et cette congruence confirme notre argument qu'une spatialisation élaborée des modèles des systèmes territoriaux va de pair avec une plus grande richesse ontologique.
+
+%Cette reflexion peut être poussée sur le plan méthodologique, au sein duquel on peut retrouver la tension entre précision du modèle et robustesse des résultats, notamment en comparant les modèles basés-agent et les modèles de systèmes dynamiques permettant un certain niveau de résolution analytique. L'archétype des approches en géographie économique, considérant un système unidimensionnel \citep{krugman1992dynamic}, perd l'essence de l'espace qui est hétérogénéité et multiplicité des alternatives, tandis que des modèles précisément spatialisés comme les modèles Luti, nécessiteront simulation et une validation restreinte des résultats \citep{bonnel2014survey}. Le degré de précision des modèles n'est cependant pas directement relié à leur caractère spatial, comme le montre la comparaison entre modèles agents et microsimulation démographique \citep{birkin2011spatial}. Cependant, les approches incluant une description élaborée de l'espace, avec la prise en compte des échelles par exemple, sont principalement associées à une richesse ontologique dans l'étude de ces systèmes, qu'il convient d'entretenir pour maintenir la diversité des connaissances sur le sujet \citep{sanders2018survival}.
+
+\sframe{Complexité ontologique}{
+\justify
+
+  Définition de la complexité particulièrement pertinente pour les systèmes sociaux par \cite{pumain2003approche} : nombres de points de vue nécessaires pour cerner un système (\textbf{complexité ontologique})
+  
+  \bigskip
+  \bigskip
+  
+  $\rightarrow$ multidimensionalité des systèmes urbains reste un défi \cite{perez2016agent} ; difficulté de l'interdisciplinarité \cite{dupuy2015sciences}
+  
+  \medskip
+  
+  $\rightarrow$ richesse des approches montrée par \cite{raimbault2017invisible} pour l'exemple des interactions entre réseaux et territoires
+  
+  \medskip
+
+  $\rightarrow$ richesse de l'espace dans la tension entre économie géographique et géographie économique \cite{marchionni2004geographical}\cite{sanders2018survival} ; se prolonge sur le plan méthodologique (ABM vs analytique)
+  
+}
+
+
+
+%Notre deuxième entrée théorique s'intéresse à la complexité en tant qu'émergence faible de structures et autonomie des niveaux supérieurs~\citep{bedau2002downward}. L'émergence faible consiste en l'interprétation que les niveaux d'un système sont effectivement \emph{computés} \citep{morin1980methode} par celui-ci, et qu'il est nécessaire de simuler le systèmes pour les reproduire. L'aspect diachronique des dynamiques permet que cette vue de l'émergence ne soit pas incompatible avec la causalité descendante. Nous rappelons le caractère intrinsèquement multi-échelle des systèmes territoriaux, qui se manifeste par exemple dans l'approche des villes comme systèmes au sein de systèmes de villes, comme l'introduit \cite{pumain1997pour} qui enrichit \cite{berry1964cities}. Par ailleurs, il existe une nécessité actuelle de production de modèles spatiaux intégrant effectivement cet aspect multi-échelle~\citep{rozenblat2018conclusion}, dans le but de modèles effectivement opérationnels.
+%Des systèmes de complexité ontologique moindre présentent aussi un rôle crucial de l'émergence faible. L'état local d'un flux de trafic est en partie conséquence de l'état global du système, en particulier lorsque des motifs de congestion conséquents sont observables à l'échelle macroscopique. Dans ce cas, les motifs spatio-temporels sont encore cruciaux dans le processus d'émergence \citep{treiber2010three}. Dans ces différents exemples, l'espace joue encore un rôle crucial pour la présence de complexité, puisque l'auto-organisation implique agencement spatial des agents, et les niveaux d'émergence sont directement liés aux échelles spatiales quel que soit l'interprétation de celles-ci \citep{manson2008does}. Une approche de l'auto-organisation par la morphogenèse, que nous détaillerons au sein de modèles par la suite, insiste d'autant plus sur l'aspect spatial dans l'émergence, puisqu'elle fait le lien entre forme et fonction \citep{doursat2012morphogenetic}, la première étant nécessairement spatialisée.
+
+\sframe{Complexité et émergence}{
+
+   \justify
+   
+   Complexité au sens de \textbf{l'émergence faible} \cite{bedau2002downward}
+   
+   \bigskip
+   \bigskip
+   
+   $\rightarrow$ nature intrinsèquement multi-échelle des systèmes de villes \cite{pumain1997pour} ; nécessité de modèles opérationnels multi-scalaires \\\cite{rozenblat2018conclusion}
+   
+   \medskip
+   
+   $\rightarrow$ pas nécessité de complexité ontologique forte pour avoir émergence faible : exemple de la congestion du trafic \cite{treiber2010three}
+   
+   \medskip
+
+	$\rightarrow$ auto-organisation spatialisée essentielle à ces processus ; concept de morphogenèse : forme et fonction \cite{doursat2012morphogenetic}
+   
+   
+}
+
+%La difficulté d'endogénéisation de niveau supérieurs autonomes peut par exemple être illustrée par~\cite{lenechet:halshs-01272236} qui propose un modèle de co-évolution entre transport et usage du sol à l'échelle métropolitaine intégrant une structure de gouvernance endogène pour le réseau de transport. Simulant les négociations entre acteurs locaux du transport, certains régimes conduisent à l'émergence d'un niveau intermédiaire de gouvernance issu de la collaboration entre acteurs voisins. Les trois niveaux décisionnels sont alors bien autonomes ontologiquement mais aussi en termes de dynamiques. L'émergence de la collaboration est finement liée à la structure spatiale, puisque les acteurs incluent les motifs d'accessibilité dans leur processus de prise de décision. Des modèles moins riches de la co-évolution entre transport et usage du sol, comme \cite{raimbault2018urban} à l'échelle mesoscopique prenant en compte forme urbaine et topologie du réseau routier, ou \cite{raimbault2018modeling} qui abstrait les réseaux sous formes de matrices de distance à l'échelle macroscopique et postule des dynamiques sur celles-ci, capturent bien une émergence fondamentalement liée à l'espace, mais restent restreints dans l'articulation des niveaux, tandis que le modèle de gouvernance est plus proche de l'émergence qualitative de niveaux supérieurs.
+
+\sframe{Emergence : le modèle Lutecia}{
+
+	\textit{Co-évolution et émergence d'un niveau intermédiaire de gouvernance au sein des méga-régions urbaines \cite{lenechet:halshs-01272236}}
+	
+	\medskip
+	
+	\centering
+	
+	\includegraphics[width=0.6\textwidth]{figures/7-3-3-fig-lutecia-governance.jpg}
+	
+	
+	
+}
+
+
+%Dans cette section ainsi que la suivante, nous proposons d'utiliser des modèles de simulation de morphogenèse urbaine pour montrer de manière concrète d'autres complexités des systèmes territoriaux. Les modèles, détaillés par la suite, sont implémentés en Netlogo \cite{wilensky1999netlogo} et en scala, et explorés à l'aide du logiciel d'exploration de modèles OpenMOLE \cite{reuillon2013openmole}. L'ensemble du code et des résultats est disponible de manière ouverte sur le dépôt git du projet à \texttt{https://github.com/JusteRaimbault/SpatialComplexity}. Les résultats de simulation sont disponibles à \texttt{https://doi.org/10.7910/DVN/LENFVH}.
+
+
+%\subsection{Systèmes dynamiques, chaos et fractales}
+%La compréhension des systèmes complexes comme systèmes dynamiques aux attracteurs plus ou moins chaotiques a été largement développée en géographie \citep{dauphine1995chaos}. Par exemple, \cite{e18060197} considère que l'information sémantique d'un environnement urbain est liée aux attracteurs de systèmes dynamiques régissant les dynamiques de ses agents. Ce type d'approche peut par ailleurs être rapprochée des approches fractales des systèmes urbains, initialement introduites par \cite{batty1994fractal}, et par exemple plus récemment appliquées à des problèmes réels de planification urbaine \citep{yamu2015spatial}. Ces questions sont liées plus généralement à des problématiques transversales de chaos spatio-temporel \citep{crutchfield1987phenomenology}. La compréhension du lien entre temps et espace, et des dynamiques non-uniformes, non-stationnaires, non-ergodiques correspondantes, reste en construction sur les plans théoriques, méthodologique et empirique, et promet de nombreuses applications pour l'étude des systèmes territoriaux. Par exemple,  \cite{chen2009urban} combine les correlations croisées et l'analyse de Fourier pour étudier un modèle de gravité urbaine. Une direction de recherche importante dans ce cadre est la compréhension de la non-stationnarité des propriétés des systèmes territoriaux, et \cite{raimbault2018urban} l'explore dans le cas de la morphologie urbaine et de la forme des réseaux.
+
+
+\sframe{Complexité dynamique}{
+
+	Chaos, bifurcations, dépendance au chemin dans les systèmes dynamiques : \textbf{complexité dynamique}
+	
+	\bigskip
+	
+	$\rightarrow$ conceptuellement ancien en géographie \cite{dauphine1995chaos} ; question ouverte du chaos spatio-temporel \cite{crutchfield1987phenomenology}
+	
+	\medskip
+	
+	$\rightarrow$ approches fractales \cite{batty1994fractal}, appliquées en pratique \cite{yamu2015spatial}
+	
+	\medskip
+	
+	$\rightarrow$ liens entre non-stationnarité et non-ergodicité ? \cite{pumain2012urban}
+	
+}
+
+
+% Nous utilisons ici un modèle de morphogenèse urbaine introduit par \cite{raimbault2018calibration} pour illustrer les propriétés de sensibilité aux conditions initiales et de dépendance au chemin des systèmes territoriaux~\citep{pumain2012urban}. En particulier, nous montrons la forte sensibilité des formes urbaines finales simulées aux perturbations spatiales, et plus généralement la dépendance au chemin des trajectoires pour les indicateurs morphologiques agrégés. Ce modèle relativement simple simule la croissance de population distribuée sur une grille, par ajout itératif de population, qui se localise suivant un attachement préférentiel à la population déjà présente puis se diffuse dans l'espace. Les paramètres cruciaux sont $N_G$ le taux de croissance exogène, $P_{max}$ la population totale finale, $\alpha$ l'exposant d'attachement préférentiel, $\beta$ le taux de diffusion et $n_d$ un nombre de diffusion par pas de temps.
+%L'experience menée par \cite{raimbault2018calibration} sur une version simplifiée à une dimension du modèle montre que les distributions semi-stationnaires de population peuvent être à distance maximale (au sens d'une norme L2 entre les distributions) à partir d'une même configuration initiale. En deux dimensions, le phénomène est identique comme l'expérience menée ici le montre. Le modèle est simulé à partir d'une configuration initiale particulièrement sensible, constituée de 4 centres initiaux de taille équivalente. Pour une grille de taille 100, 4 centres sont positionnés au milieu de chaque cadrant, avec un noyau exponentiel de population de la forme $P_0 \cdot \exp \left(-r/r_0\right)$ avec $P_0 = 100$ et $r_0 = 5$. Le modèle est alors simulé pour des valeurs données des paramètres d'agrégation $\alpha$, de diffusion $\beta, n_d$, de croissance et population $N_G, P_{max}$ (voir \cite{raimbault2018calibration}), et une réalisation de la distance entre configuration $d(t)$ est calculée sur deux réalisations indépendantes des populations $P^{(k)}_i(t)$, comme $d(t)=\norm{P^{(1)}_i(t) - P^{(2)}_i(t)}$. Un plan d'expérience direct est effectué, par échantillonnage LHS de 390 points de paramètres et 1000 répétitions.
+
+\sframe{Morphogenèse par agrégation-diffusion}{
+
+  \textit{Exploration d'un modèle de morphogenèse urbaine par agrégation-diffusion \cite{raimbault2018calibration}}
+  
+  \bigskip\bigskip
+  
+  \centering
+  
+  \includegraphics[width=0.38\textwidth]{figures/5-2-2-fig-density-fig2.jpg}\hspace{0.05cm}  \includegraphics[width=0.58\textwidth]{figures/5-2-2-fig-density-fig4.jpg}
+  
+}
+
+
+
+\sframe{Exploration des modèles}{
+
+ 
+Calculs distribués sur grille par l'intermédiaire du logiciel open source OpenMOLE \url{https://next.openmole.org/} \cite{reuillon2013openmole}
+
+\centering
+
+\smallskip
+
+\includegraphics[height=0.35\textheight]{figures/openmole.png}
+
+\smallskip
+
+\raggedright\justify
+
+\footnotesize \textit{OpenMOLE: (i) embarque tout modèle comme une boîte noire ; (ii) fournit un accès transparent aux environnements de calcul haute performance ; (iii) fournit des méthodes d'exploration et de calibration des modèles de simulation.}
+
+\bigskip
+
+\textbf{Ecole d'été ExModelo} : \textit{save the date} pour juin 2020
+\\(\texttt{https://exmodelo.org/})
+
+}
+
+
+
+% Nous montrons en Fig.~\ref{fig:lyapounov} une estimation basique des exposants de Lyaponouv, effectuée par ajustement par régression linéaire par morceaux avec deux segments, de $\log d(t)$ en fonction de $t$, sur l'ensemble des répétitions pour un point de paramètres. L'ajustement est relativement bon puisque le premier quartile du $R^2$ ajusté est à 0.92 et sa moyenne à 0.93. L'exposant de Lyapounov sur le premier segment, qu'on note $\lambda_1$, varie entre 0.05 et 0.84 avec une moyenne de 0.31. Ainsi, la qualité de l'ajustement et les valeurs positives montrent la forte sensibilité aux conditions initiales des configurations générées. Des régimes temporels assez différents, puisque le temps de rupture $t_b$ estimé varie entre 2.5 et 37.0. Les valeurs de $\lambda_2$ sont plus faibles, avec une moyenne à 0.02. Il existe un premier régime durant lequel le principal de la structure urbaine se constitue puis un deuxième régime (qu'on pourrait qualifier de ``semi-stationnaire'') pendant lequel les évolutions sont plus mineures. Cela suggère par ailleurs un critère d'arrêt endogène au modèle. Les courbes de $\log d(t)$ montrées en Fig.~\ref{fig:lyapounov} sont pour une valeur maximale de l'ajustement et une valeur maximale de $\lambda_1$. Nous montrons aussi les variations des exposants en fonction des paramètres. $\lambda_1$ en fonction de l'agrégation $\alpha$ présente un comportement inattendu, relativement stable en dessous de 1.5 puis une croissance linéaire au dessus, sans modification autour de 1, ce qui suggère un seuil au dessus duquel ce processus influe drastiquement sur la forme urbaine. Pour les plus faibles valeurs de $\beta$, un maximum local à 1 suggère un rôle de l'aspect infra ou supra-linéaire du régime. Pour le comportement de $\lambda_2$, un effet significatif s'observe uniquement pour les plus forts taux de croissance, et correspond à un maximum autour de 1.5, c'est-à-dire que le passage au second régime pour $\lambda_1$ correspond dans ce cas à une meilleure stabilisation pour la seconde phase. Cette étude montre donc la sensibilité des configurations urbaines à des perturbations infinitésimales (ce qui est est équivalent à une perturbation de l'état initial).
+
+\sframe{Sensibilité aux conditions initiales}{
+
+\justify
+
+Estimation de l'exposant de Lyapounov local pour la distribution des populations : ajustement linéaire par morceaux de $\log \norm{P^{(1)} - P^{(2)}}$ pour deux réalisations indépendantes à partir d'une configuration initiale sensible
+
+\bigskip
+\bigskip
+
+\centering
+
+\includegraphics[width=0.5\textwidth]{figures/configdist_boxplot_id3642.png}\includegraphics[width=0.5\textwidth]{figures/configdist_boxplot_id3784.png}
+
+}
+
+\sframe{Exposants de Lyapounov}{
+
+Changement de régime inattendu à $\alpha \simeq 1.5$ : seuil de sensibilité de la structure urbaine
+
+\bigskip
+\bigskip
+
+\centering
+
+\includegraphics[width=0.55\textwidth]{figures/lambda1_alpha_colbeta.png}\includegraphics[width=0.55\textwidth]{figures/lambda2_alpha_colrelgrowthrate.png}
+
+}
+
+% Par ailleurs, nous illustrons les trajectoires temporelles des indicateurs morphologiques agrégés. Un plan d'expérience similaire avec une seule simulation du modèle à chaque répétition et un état initial vide, mais en suivant dans le temps les valeurs des indicateurs de forme urbaine (Moran, entropie, distance moyenne, hiérarchie), montre que les trajectoires des celles-ci sont dépendantes au chemin. En effet, l'exemple de la Fig.~\ref{fig:morphotraj} montre une divergence importante des trajectoires à partir du même point initial, mais surtout des trajectoires se croisant (les indicateurs ne peuvent donc pas être formulés comme système dynamique déterministe dans lequel les trajectoires ne peuvent se croiser par le théorème de Cauchy-Lipschitz), révélant de nombreux points où la forme urbaine est très proche (au moins pour les deux indicateurs présentés) pour deux trajectoires, mais le passé et le futur sont différents. Ainsi, l'état futur d'un système urbain dépend entièrement de la trajectoire passée, et deux systèmes très similaires à un instant donné peuvent présenter des trajectoires fondamentalement différentes. Il s'agit naturellement d'une illustration par un modèle jouet, sur l'aspect particulier de la forme urbaine, mais les effets de dépendance au chemin sont a priori encore plus importants avec la prise en compte des multiples niveaux, des aspects politiques, des infrastructures \citep{pumain2012urban}.
+
+\sframe{Dépendance au chemin}{
+
+\justify
+
+\small
+ Trajectoire des indicateurs morphologiques agrégés : existence de trajectoires qui se croisent (impossibilité de représentation en système différentiel déterministe par Cauchy-Lipschitz), dépendance au chemin pour les trajectoires correspondantes
+ 
+ \bigskip
+ 
+ \centering
+ 
+ \includegraphics[width=0.6\textwidth]{figures/trajs_moran-dist_seed8578.png}
+
+}
+
+
+
+
+%Une certaine approche des systèmes complexes territoriaux privilégie le concept de co-évolution. L'intrication forte des éléments présents au sein de ce qui peut être compris comme niches territoriales, au sens des niches écologiques de \cite{holland2012signals}, est une expression d'une co-évolution et donc d'une complexité au sein de ces niches. \cite{raimbault2018modeling} montre l'existence empirique de ces niches spatiales dans le cas du système de villes français sur le temps long, ainsi que leur émergence au sein d'un modèle de co-évolution entre villes et réseaux de transport à l'échelle macroscopique.
+%Nous explorons alors ici par des expériences de simulation le lien entre non-stationnarité spatiale, qui est également un marqueur de complexité spatiale, et émergence de niches au sein d'un modèle de morphogenèse hybride couplant développement urbain et réseau, introduit par~\cite{raimbault2014hybrid}.
+
+%Le modèle RBD~\citep{raimbault2014hybrid} couple de manière simple croissance urbaine et évolution du réseau viaire. La flexibilité des régimes qu'il permet de capturer fournit dans~\cite{raimbault2017identification} un test pour une méthode d'identification de causalités spatio-temporelles. Nous étendons ici cette méthode par une détection endogène des zones spatiales sur lesquelles sont estimées les corrélations, afin de montrer l'émergence de niches par la non-stationnarité. Pour une description précise du modèle ainsi que son utilisation comme producteur de données synthétiques, se référer à \cite{raimbault2018caracterisation}. Dans notre cas, les paramètres variables sont le nombre de centres initiaux $N_C$ ainsi que les poids relatifs des différentes variables explicatives $(w_c,w_r,w_d)$ (distance au centre, distance au réseau, densité) régissant la valeur locale lors de l'étalement urbain.
+
+% Experimental setup:
+%  - fixed distrib of field centers weight values ; repetitions with varying positions.
+%  -> indicators : optimal number of niches ? "modularity" of these ? [idea : construct neighborhood network, weight = correlation, then modularity detection ?)
+%La non-stationnarité est introduite en faisant ces derniers paramètres de poids dans l'espace. Nous distinguons deux implémentations, étant donné des valeurs attribuées à chaque centre : (i) la valeur locale des poids est donnée par celle du centre le plus proche ; (ii) la valeur locale est la moyenne des valeurs des centres pondérée par les distances à ceux-ci.
+
+\sframe{Complexité et co-évolution}{
+ 
+ \justify
+ 
+ %\vspace{-2cm}
+ 
+ La complexité comme existence de \textbf{niches de co-évolution} (niches territoriales, au sens étendu de \cite{holland2012signals})
+ 
+ \medskip
+ 
+ $\rightarrow$ \cite{raimbault2018caracterisation} propose une définition de la co-évolution multi-niveau spécifique aux systèmes territoriaux ; \cite{raimbault2018modeling} émergence de niches au sein d'un modèle macroscopique de co-évolution ; \cite{raimbault2017identification} méthode de caractérisation empirique basée sur les corrélations retardées
+ 
+ \medskip
+ 
+ \textbf{Question ouverte : } rôle de la non-stationnarité spatiale des processus dans l'émergence de niches territoriales ? (aka \textit{un certain niveau de ``complexité'' spatiale implique-t-il co-évolution ?})
+ 
+ \medskip
+ 
+ $\rightarrow$ extension d'un modèle de morphogenèse urbaine par co-évolution (modèle RBD \cite{raimbault2014hybrid}) par non-stationnarité ; extension spatiale de la méthode de détection de régimes de co-évolution \\\cite{raimbault2017identification} (détection de niches)
+ 
+
+
+}
+
+
+\sframe{Le modèle RBD}{
+
+
+
+\centering
+
+\includegraphics[width=\textwidth]{figures/regimes_1.png}
+
+
+
+}
+
+
+
+
+% Notre plan d'expérience compare les deux modalités de non-stationnarité (distributions aléatoires des poids) à la version uniforme du modèle prise pour l'ensemble des valeurs extrêmes des poids, le nombre de centres $N_C$ variant entre 3 et 8, et 100 réplications sont effectuées pour chaque point de paramètre. Nous montrons en Fig.~\ref{fig:rbd} un exemple de configuration obtenue dans le cas d'une non-stationnarité par centre le plus proche et la classification spatiale correspondante. La continuité spatiale des clusters est essentielle puisque ceux-ci correspondent alors aux niches de co-évolution. Les valeurs des indicateurs confirment l'existence systématique de ces niches. En effet, le rayon moyen, qui donne l'étalement spatial des clusters, est d'une part considérablement différent du modèle nul pour l'ensemble des paramètres, mais surtout significativement (au sens statistique) plus bas pour la non-stationnarité par centre plus proche par rapport à l'ensemble des configurations de contrôle. La non-stationnarité linéaire n'est quant à elle pas conclusive. Les autres indicateurs confirment l'émergence des niches: la distance entre profils des centroïdes est la plus grande dans le cas non-stationnaire par centre le plus proche, ce qui veut dire qu'il s'agit du cas où les clusters ont le plus de sens en termes de différentiations des caractéristiques. Cela correspond aussi à la plus basse variance intra-cluster, observée pour les plus grand nombres de centres. La distance moyenne des centroïdes aux centres est cependant la plus grande pour cette configuration, montrant que les niches ne coincident pas avec les zones de non-stationnarité, ce qui confirme que celles-ci sont bien émergentes et non juste la reproduction de la configuration initiale. Ainsi, cette expérience montre que la non-stationnarité spatiale mène à l'émergence de niches spatiales (qui ont une cohérence spatiale intrinsèque) pour les profils de corrélations retardées, et donc de niches de co-évolution au sens de \cite{raimbault2018caracterisation}. L'espace est encore une fois essentiel pour la production d'une complexité, cette fois au sens d'une co-évolution.
+
+
+\sframe{Détection spatiale des régimes de co-évolution}{
+
+\textit{Classification non-supervisée pour les profils de corrélations retardées estimés sur des fenêtres glissantes}
+
+\bigskip
+\bigskip
+
+\includegraphics[width=0.49\textwidth]{figures/ex_0_tf30.png}\hspace{0.01cm}
+\includegraphics[width=0.49\textwidth]{figures/ex_0_tf30_rsclustering321.png}
+
+}
+
+
+\sframe{Emergence de niches territoriales}{
+
+\small
+
+$\rightarrow$ Indicateurs pour quantifier le ``niveau de niche'' des clusters obtenus : rayon normalisé moyen ; distance entre les features des centroïdes ; distance au centres de non-stationnarité ; intra-cluster variance
+
+\medskip
+
+$\rightarrow$ Modèle nul par permutation aléatoire des étiquettes de cluster ; modèle de référence (stationnaire) ; test de deux modes de non-stationnarité spatiale (gradient ; plus proche centre)
+
+\bigskip
+\bigskip
+
+\includegraphics[width=0.49\textwidth]{figures/radius.png}
+\includegraphics[width=0.49\textwidth]{figures/profiledisteucl.png}
+
+\medskip
+
+\textit{Niveau de niche le plus haut pour la non-stationnarité la plus forte}
+
+}
+
+
+
+% Diverses approches de la complexité que nous n'avons pu aborder peuvent être suggérées en perspective, comme étant également typique des systèmes territoriaux et pouvant être liées à l'espace. Il pourrait par exemple exister un lien entre complexité computationnelle et caractère de grande déviation des configurations territoriales (impossibilité empirique en probabilité de les obtenir en force brute) : dans quelle mesure un système territorial est-il facile à générer par computation, et quelles propriétés peuvent expliquer cette possibilité ? En effet, à l'image des propriétés computationnelles de systèmes biologiques spatiaux auto-organisés comme le \emph{slime mould} qui sont capables de résoudre des problèmes NP-complets \citep{zhu2013amoeba}, les systèmes territoriaux pourrait en ce sens avoir une certaine intelligence, la question restant ouverte dans quelle mesure ceci est lié à sa configuration spatiale. Il pourrait aussi être suggéré un lien entre complexité informationnelle et diffusion de l'innovation dans les systèmes territoriaux \citep{favaro2011gibrat}. La diffusion de l'innovation est suggérée comme un moteur fondamental des dynamiques urbaines par la théorie évolutive urbaine. L'innovation est liée aux processus d'évolution culturelle \citep{Mesoudi25072017} et donc à une complexité informationnelle au sens de motifs non triviaux de transmission et traitement de l'information. La distribution spatiale de ces processus, et dans quelle mesure celle-ci influence ses propriétés, est une piste de développement importante pour l'étude de la complexité spatiale des systèmes territoriaux.
+
+
+\sframe{Discussion}{
+
+\justify
+
+\textit{Systèmes territoriaux et autres dimensions de la complexité}
+
+\bigskip
+
+$\rightarrow$ complexité computationnelle et caractère de grande déviation des distributions spatiales des activités humaines ((i) impossibilité en probabilité d'obtenir de telles distributions ; (ii) capacités computationnelles voire cognitives des systèmes territoriaux ? cf \emph{slime mould} \cite{zhu2013amoeba})
+
+\bigskip
+
+$\rightarrow$ complexité informationnelle et rôle des processus d'innovation dans la morphogenèse des systèmes de villes \cite{favaro2011gibrat} ; lien avec les processus d'évolution culturelle nécessairement spatialisés
+\\\cite{Mesoudi25072017} (cf émergence des langues)
+
+
+}
+
+
+
+
+
+% Le travail développé ici s'est cantonné à des considérations théoriques et des exemples jouets. La construction systématique, autant au sens de construction des concepts par revue systématique, que de construction de théories et méthodes articulant de manière pertinentes ces différents liens entre complexité et espace, reste une perspective ouverte pour des recherches futures. Nous concluons ainsi, suivant \cite{raimbault2017complexity}, que les systèmes territoriaux sont nécessairement au croisement de multiples complexités, et ajoutons, d'après les divers exemples développés ici, que leur caractère spatial prend une place importante dans l'émergence de celles-ci.
+
+
+
+\section{Conclusion}
+
+
+\sframe{Conclusion}{
+
+\justify
+
+\small
+
+$\rightarrow$ Vers une intégration plus systématique (épistémologiquement et théoriquement) des différentes complexités pour l'étude des systèmes territoriaux ? \\\cite{raimbault2018relating}
+
+\medskip
+
+$\rightarrow$ Réflexivité (entre autre complexité appliquée à la complexité) nécessaire pour une connaissance complexe \cite{morin1991methode} ; vers un perspectivisme appliqué ? \cite{banos2018spatialised}
+
+\bigskip
+
+\footnotesize
+
+\textbf{Références}
+
+
+
+Raimbault, J. (2018). Calibration of a density-based model of urban morphogenesis. PloS one, 13(9):e0203516
+
+\smallskip
+
+Raimbault, J., Banos, A., \& Doursat, R. (2014, June). A Hybrid Network/Grid Model of Urban Morphogenesis and Optimization. In 4th International Conference on Complex Systems and Applications (pp. 51-60).
+
+\bigskip
+
+
+\footnotesize{ - Code, données et résultats disponibles à\\ \texttt{https://github.com/JusteRaimbault/SpatialComplexity}\\
+ - Article à\\ \texttt{https://github.com/JusteRaimbault/SpatialComplexity/Docs/Rochebrune2019/}\\\texttt{Versions/Rochebrune2019{\_}Raimbault{\_}v1.pdf}\\
+- Remerciements à \textit{European Grid Infrastructure} et ses \textit{National Grid Initiatives} (\textit{France-Grilles} en particulier) pour le support technique et l'infrastructure.
+
+}
+
+}
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+\frametitle{References}
+\bibliographystyle{apalike}
+\bibliography{biblio}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+

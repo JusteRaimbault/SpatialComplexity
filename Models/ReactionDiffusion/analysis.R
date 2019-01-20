@@ -66,6 +66,7 @@ for(i in 1:length(ids)){
 #stopCluster(cl)
 
 save(adjr2,lambda1,lambda2,ids,breaks,file=paste0(resdir,'lyapounov_',experiment,'.RData'))
+load(paste0(resdir,'lyapounov_',experiment,'.RData'))
 #save(res,file=paste0(resdir,'lyapounov_',experiment,'.RData'))
 
 summary(lambda1)
@@ -176,8 +177,10 @@ g+geom_point(size=0.1)+geom_path(arrow=arrow())
 s=8578
 set.seed(s)
 g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
-g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
-
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+
+  ggtitle(bquote(N[G]/P[tot]*"="*.(round(d$ng[1]/d$pmax[1],digits=5))*" ; "*alpha*"="*.(round(d$alpha[1],digits=2))*" ; "*beta*"="*.(round(d$beta[1],digits=2))*" ; "*n[d]*"="*.(round(d$nd[1]))))+
+  stdtheme
+ggsave(file=paste0(resdir,'trajs_moran-dist_seed',s,'.png'),width=22,height=20,units='cm')
 
 
 
