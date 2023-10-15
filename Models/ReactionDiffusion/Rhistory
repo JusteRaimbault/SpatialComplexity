@@ -1,0 +1,512 @@
+plotLaggedCorrs(x)
+ar=array(data = c(diag(2),rep(0,4),c(0,runif(1,-maxai,maxai),0,0)),dim = c(2,2,3))
+x=marima.sim(kvar=2,ar.model = ar,nsim=10000)
+plotLaggedCorrs(x)
+ar=array(data = c(diag(2),rep(0,4),c(0,runif(1,-maxai,maxai),0,0)),dim = c(2,2,3))
+x=marima.sim(kvar=2,ar.model = ar,nsim=10000)
+plotLaggedCorrs(x)
+ar=array(data = c(diag(2),rep(0,4),c(0,runif(1,-maxai,maxai),runif(1,-maxai,maxai),0)),dim = c(2,2,3))
+x=marima.sim(kvar=2,ar.model = ar,nsim=10000)
+x
+plot(1:nrow(x),x[,1],type='l')
+ar=array(data = c(diag(2),c(0,0.5,0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=100000)
+plot(1:100000,x[,1],type='l');points(1:1000,x[,2],col='red',type='l')
+plot(1:100000,x[,1],type='l');points(1:100000,x[,2],col='red',type='l')
+x=marima.sim(kvar=2,ar.model = ar,nsim=1000)
+plot(1:1000,x[,1],type='l');points(1:1000,x[,2],col='red',type='l')
+ar=array(data = c(diag(2),c(0,0.5,-0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=1000)
+plot(1:1000,x[,1],type='l');points(1:1000,x[,2],col='red',type='l')
+ar=array(data = c(diag(2),c(0,-0.5,-0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=1000)
+plot(1:1000,x[,1],type='l');points(1:1000,x[,2],col='red',type='l')
+epsilon=matrix(rnorm(2000),ncol=2)
+espilon
+epsilon
+cor(epsilon)
+x=matrix(rep(0,2000),ncol=2)
+for(t in 2:nrow(x)){x[t,]=0.1*epsilon[t-1,c(2,1)]+epsilon[t,]}
+x
+plot(1:2000,x[,1],type='l')
+dim(x)
+plot(1:1000,x[,1],type='l')
+plot(1:nrow(x),x[,1],type='l')
+epsilon=matrix(rnorm(20000),ncol=2)
+x=matrix(rep(0,20000),ncol=2)
+for(t in 2:nrow(x)){x[t,]=0.1*epsilon[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+epsilon=matrix(rnorm(20000),ncol=2)
+x=matrix(rep(0,20000),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=0.1*x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+epsilon=matrix(rnorm(20000),ncol=2)
+x=matrix(rep(0,20000),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+epsilon=matrix(rnorm(20000),ncol=2)
+x=matrix(rep(0,20000),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+epsilon=matrix(rnorm(20000),ncol=2)
+x=matrix(rep(0,20000),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+tf=100000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+tf=100000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+help(marima.sim)
+marima.sim
+pol.mul
+help(pol.mul)
+ar=array(data = c(diag(2),c(0,-0.5,-0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=1000)
+plot(1:1000,x[,1],type='l');points(1:1000,x[,2],col='red',type='l')
+cor.test(x[2:nrow(x),1],x[1:(nrow(x)-1),2])
+var(x[,1])
+tf=10000
+ar=array(data = c(diag(2),c(0,-0.5,-0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=tf)
+plot(1:tf,x[,1],type='l');points(1:tf,x[,2],col='red',type='l')
+var(x[,1])
+tf=100000
+ar=array(data = c(diag(2),c(0,-0.5,-0.5,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=tf)
+cor.test(x[2:nrow(x),1],x[1:(nrow(x)-1),2])
+var(x[,1])
+tf=100000
+ar=array(data = c(diag(2),c(0,0,0,0)),dim = c(2,2,2))
+x=marima.sim(kvar=2,ar.model = ar,nsim=tf)
+var(x[,1])
+marima.sin
+marima.sim
+kvar=2
+ar.dif <- array(c(diag(kvar)), dim = c(kvar, kvar, 1))
+ar.dif
+ar
+ar.model.d <- pol.mul(ar.model, ar.dif, L = (Lar + Ldif -
+2 + 1))
+ar.model.d <- pol.mul(ar, ar.dif)
+ar.model.d <- pol.mul(ar.model, ar.dif, L = (1 + 2 -
+2 + 1))
+ar.model.d <- pol.mul(ar, ar.dif, L = (1 + 2 -
+2 + 1))
+ar.model.d
+marima.sim
+LL <- pol.order(ar.model.d) + 1
+LL
+ar.model.d
+ar
+ar=array(data = c(diag(2),c(0,-0.5,-0.5,0)),dim = c(2,2,2))
+ar
+ar.model.d <- pol.mul(ar, ar.dif, L = (1 + 2 -
+2 + 1))
+ar.model.d
+marima.sim
+tf=100000
+tf=10000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t,]-0.5*x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+tf=10000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=x[t,]-x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+tf=10000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=-x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+tf=10000
+epsilon=matrix(rnorm(2*tf),ncol=2)
+x=matrix(rep(0,2*tf),ncol=2);x[1,]=epsilon[1,]
+for(t in 2:nrow(x)){x[t,]=-0.8*x[t-1,c(2,1)]+epsilon[t,]}
+plot(1:nrow(x),x[,1],type='l')
+var(epsilon)
+1/1-0.8
+1/(1-0.8)
+var(x)
+1/(1-0.8^2)
+install.packages("scholar")
+library(scholar)
+scholar::get_citation_history("3559635412259202692")
+help("get_citation_history")
+get_article_cite_history("","3559635412259202692")
+get_article_cite_history("zoioGw4AAAAJ","3559635412259202692")
+help(get_article_cite_history)
+get_profile("zoioGw4AAAAJ")
+get_profile
+getOption
+runif(n = 100000)
+matrix(runif(n = 100000),ncol=10)
+prcomp(matrix(runif(n = 100000),ncol=10))
+summary(prcomp(matrix(runif(n = 100000),ncol=10)))
+summary(prcomp(matrix(runif(n = 100000),ncol=10)))
+summary(prcomp(matrix(runif(n = 100000),ncol=10)))
+summary(prcomp(matrix(runif(n = 1000000),ncol=10)))
+summary(prcomp(matrix(runif(n = 10000000),ncol=10)))
+1/406
+summary(prcomp(matrix(runif(n = 10000000),ncol=20)))
+library(ggplot2)
+library(marima)
+source(paste0(Sys.getenv('CN_HOME'),'/Models/Utils/R/plots.R'))
+resdir = paste0(Sys.getenv('CN_HOME'),'/Results/SpatioTempCausality/Synthetic/arma/')
+#'
+#' rho[X(t-tau),Y(t)]
+getLaggedCorrs <- function(x,y,taumax=10){
+res=data.frame()
+for(tau in -taumax:taumax){
+if(tau>=0){xx=x;yy=y}else{xx=y;yy=x}
+corrs = cor.test(xx[1:(length(xx)-abs(tau))],yy[(abs(tau)+1):(length(yy))])
+estimate = corrs$estimate
+rhomin = corrs$conf.int[1]
+rhomax = corrs$conf.int[2]
+res=rbind(res,data.frame(rho=estimate,rhomin = rhomin,rhomax=rhomax,tau=tau,pval=corrs$p.value,tstat=corrs$statistic))
+}
+return(res)
+}
+plotLaggedCorrs <- function(X,taumax=10){
+df = data.frame()
+for(j1 in 1:(ncol(X)-1)){
+for(j2 in (j1+1):ncol(X)){
+df=rbind(df,data.frame(getLaggedCorrs(X[,j1],X[,j2],taumax = taumax),vars=paste0(j1,"->",j2)))
+}
+}
+g=ggplot(df,aes(x=tau,y=rho,colour=vars,group=vars,ymin=rhomin,ymax=rhomax))
+g+geom_line()+geom_errorbar()+geom_point()+stdtheme
+}
+laggedCorrs <- function(X,taumax=10,format="rowdf"){
+df = data.frame()
+if(format=="coldf"){df=c()}
+for(j1 in 1:(ncol(X)-1)){
+for(j2 in (j1+1):ncol(X)){
+corrs = getLaggedCorrs(X[,j1],X[,j2],taumax = taumax)
+if(format=="rowdf"){
+df=rbind(df,data.frame(corrs,vars=paste0(j1,"->",j2)))
+}
+if(format=="coldf"){
+df = append(df,corrs$rho)
+}
+}
+}
+if(format=="rowdf"){
+return(df)
+}
+if(format=="coldf"){
+return(data.frame(matrix(df,ncol=length(df))))
+}
+}
+nbootstrap = 10000
+maxai = 0.1
+lag = 2
+# set seed for reproducibility
+set.seed(0)
+trajs=data.frame();eigs=data.frame()
+for(b in 1:nbootstrap){
+if(b%%100==0){show(b)}
+#ar=array(data = c(diag(3),runif(9,-0.5,0.5)),dim = c(3,3,2))
+#x=marima.sim(kvar=3,ar.model = ar,nsim=10000)
+ar=array(data = c(diag(2),rep(0,4),c(0,runif(1,-maxai,maxai),runif(1,-maxai,maxai),0)),dim = c(2,2,3))
+x=marima.sim(kvar=2,ar.model = ar,nsim=10000)
+plotLaggedCorrs(x)
+trajs=rbind(trajs,laggedCorrs(x,format = "coldf"))
+#eigs=rbind(eigs,eigen(ar[,,2])$values)
+eigs=rbind(eigs,c(ar[1,2,3],ar[2,1,3]))
+}
+set.seed(0)
+trajs=data.frame();eigs=data.frame()
+for(b in 1:nbootstrap){
+if(b%%100==0){show(b)}
+#ar=array(data = c(diag(3),runif(9,-0.5,0.5)),dim = c(3,3,2))
+#x=marima.sim(kvar=3,ar.model = ar,nsim=10000)
+ar=array(data = c(diag(2),rep(0,4),c(0,runif(1,-maxai,maxai),runif(1,-maxai,maxai),0)),dim = c(2,2,3))
+x=marima.sim(kvar=2,ar.model = ar,nsim=10000)
+#plotLaggedCorrs(x)
+trajs=rbind(trajs,laggedCorrs(x,format = "coldf"))
+#eigs=rbind(eigs,eigen(ar[,,2])$values)
+eigs=rbind(eigs,c(ar[1,2,3],ar[2,1,3]))
+}
+help(chol)
+coords = matrix(runif(2*n),ncol = 2)
+n = 20
+coords = matrix(runif(2*n),ncol = 2)
+coords
+plot(coords)
+help(spDist )
+??spDist
+library(sp)
+dist(coords)
+d = dist(coords)
+chol(d)
+d
+d[1,1]
+d = as.matrix(dist(coords))
+d[1,1]
+d[1,2]
+d[2,1]
+chol(d)
+helpp(chol)
+help(chol)
+diag(d)<-1
+chol(d)
+d
+chol(d,pivot=T)
+d = as.matrix(dist(coords))
+length(d)
+d = d + matrix(rnorm(length(d),sd = 0.01),nrow = nrow(d))
+diag(d)<-1
+chol(d,pivot=T)
+c = chol(d,pivot=T)
+c%*%t(c)
+2000/60
+8000*4
+8000*4/2000/60
+8000*4/2000
+8000*4/2000
+8000*4/2000*100/60
+8000*4/2000*50/60
+setwd(paste0(Sys.getenv('CS_HOME'),'/SpatialComplexity/Models/ReactionDiffusion'))
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(segmented)
+source(paste0(Sys.getenv('CS_HOME'),'/Organisation/Models/Utils/R/plots.R'))
+experiment='20190117_1029_MORPHO_GRID'
+resdir=paste0(Sys.getenv('CS_HOME'),'/SpatialComplexity/Results/ReactionDiffusion/',experiment,'/');dir.create(resdir)
+header<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=30,what='character',sep=",")
+header
+header<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=40,what='character',sep=",")
+header
+header<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=32,what='character',sep=",")
+header
+res<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=50001,skip = 1,what='character')
+res
+s = res[2]
+s
+splited = strsplit(s,",")
+splited
+splited = strsplit(s,",")[[1]]
+header
+tstep=5
+tsteps = (length(splited)-7)/5
+tsteps
+length(splited)-7
+splited[4:(tsteps+4)]
+splited[(tsteps+4):(2*tsteps+3)]
+splited[(2*tsteps+5):(3*tsteps+4)]
+splited[2*tsteps+4]
+splited[(2*tsteps+6):(3*tsteps+5)]
+splited[(4*tsteps+8):(5*tsteps+7)]
+(0:(tsteps))*tstep
+data.frame(alpha=rep(splited[1],tsteps),beta=rep(splited[2],tsteps),nd=rep(splited[3],tsteps),
+distance=splited[4:(tsteps+3)],entropy=splited[(tsteps+4):(2*tsteps+3)],
+ng=rep(splited[2*tsteps+4],tsteps),id=rep(splited[2*tsteps+5],tsteps),
+moran=splited[(2*tsteps+6):(3*tsteps+5)],
+pmax=rep(splited[3*tsteps+6],tsteps),replication=rep(splited[3*tsteps+7],tsteps),
+rsquared=splited[(3*tsteps+8):(4*tsteps+7)],slope=splited[(4*tsteps+8):(5*tsteps+7)],
+t=(0:(tsteps))*tstep
+)
+tsteps
+rep(splited[1],tsteps)
+rep(splited[2],tsteps)
+rep(splited[3],tsteps)
+splited[4:(tsteps+3)]
+splited[(tsteps+4):(2*tsteps+3)]
+rep(splited[2*tsteps+4],tsteps)
+rep(splited[2*tsteps+5],tsteps)
+splited[(2*tsteps+6):(3*tsteps+5)]
+rep(splited[3*tsteps+6],tsteps)
+rep(splited[3*tsteps+7],tsteps)
+splited[(3*tsteps+8):(4*tsteps+7)]
+splited[(4*tsteps+8):(5*tsteps+7)]
+(0:(tsteps))*tstep
+data.frame(alpha=rep(splited[1],tsteps),beta=rep(splited[2],tsteps),nd=rep(splited[3],tsteps),
+distance=splited[4:(tsteps+3)],entropy=splited[(tsteps+4):(2*tsteps+3)],
+ng=rep(splited[2*tsteps+4],tsteps),id=rep(splited[2*tsteps+5],tsteps),
+moran=splited[(2*tsteps+6):(3*tsteps+5)],
+pmax=rep(splited[3*tsteps+6],tsteps),replication=rep(splited[3*tsteps+7],tsteps),
+rsquared=splited[(3*tsteps+8):(4*tsteps+7)],slope=splited[(4*tsteps+8):(5*tsteps+7)],
+t=(0:(tsteps-1))*tstep
+)
+data.frame(alpha=as.numeric(rep(splited[1],tsteps)),beta=as.numeric(rep(splited[2],tsteps)),nd=as.numeric(rep(splited[3],tsteps)),
+distance=as.numeric(splited[4:(tsteps+3)]),entropy=as.numeric(splited[(tsteps+4):(2*tsteps+3)]),
+ng=as.numeric(rep(splited[2*tsteps+4],tsteps)),id=as.numeric(rep(splited[2*tsteps+5],tsteps)),
+moran=as.numeric(splited[(2*tsteps+6):(3*tsteps+5)]),
+pmax=as.numeric(rep(splited[3*tsteps+6],tsteps)),replication=as.numeric(rep(splited[3*tsteps+7],tsteps)),
+rsquared=as.numeric(splited[(3*tsteps+8):(4*tsteps+7)]),slope=as.numeric(splited[(4*tsteps+8):(5*tsteps+7)]),
+t=(0:(tsteps-1))*tstep
+)
+res<-sapply(res,function(s){
+splited = strsplit(s,",")[[1]]
+tsteps = (length(splited)-7)/5
+data.frame(alpha=as.numeric(rep(splited[1],tsteps)),beta=as.numeric(rep(splited[2],tsteps)),nd=as.numeric(rep(splited[3],tsteps)),
+distance=as.numeric(splited[4:(tsteps+3)]),entropy=as.numeric(splited[(tsteps+4):(2*tsteps+3)]),
+ng=as.numeric(rep(splited[2*tsteps+4],tsteps)),id=as.numeric(rep(splited[2*tsteps+5],tsteps)),
+moran=as.numeric(splited[(2*tsteps+6):(3*tsteps+5)]),
+pmax=as.numeric(rep(splited[3*tsteps+6],tsteps)),replication=as.numeric(rep(splited[3*tsteps+7],tsteps)),
+rsquared=as.numeric(splited[(3*tsteps+8):(4*tsteps+7)]),slope=as.numeric(splited[(4*tsteps+8):(5*tsteps+7)]),
+t=(0:(tsteps-1))*tstep
+)
+})
+res
+res[1]
+res[[1]]
+res[[2]]
+res[[3]]
+head(unlist(res))
+length(res)
+res[1:3]
+sres=as.tbl(data.frame(alpha=res[seq(1,length(res),13)],beta=res[seq(2,length(res),13)]))
+res[seq(1,length(res),13)]
+sres=as.tbl(data.frame(alpha=unlist(res[seq(1,length(res),13)]),
+beta=unlist(res[seq(2,length(res),13)])
+))
+sres
+sres=as.tbl(data.frame(alpha=unlist(res[seq(1,length(res),13)]),
+beta=unlist(res[seq(2,length(res),13)]),
+nd=unlist(res[seq(3,length(res),13)]),
+distance=unlist(res[seq(4,length(res),13)]),
+entropy=unlist(res[seq(5,length(res),13)]),
+ng=unlist(res[seq(6,length(res),13)]),
+id=unlist(res[seq(7,length(res),13)]),
+moran=unlist(res[seq(8,length(res),13)]),
+pmax=unlist(res[seq(9,length(res),13)]),
+replication=unlist(res[seq(10,length(res),13)]),
+rsquared=unlist(res[seq(11,length(res),13)]),
+slope=unlist(res[seq(12,length(res),13)]),
+t=unlist(res[seq(13,length(res),13)])
+))
+warnings()
+sres
+unique(sres$id)
+save(sres,file=paste0('exploration/',experiment,'.RData'))
+res<-scan(file=paste0('exploration/',experiment,'.csv'),nmax=-1,skip = 1,what='character')
+res<-sapply(res,function(s){
+splited = strsplit(s,",")[[1]]
+tsteps = (length(splited)-7)/5
+data.frame(alpha=as.numeric(rep(splited[1],tsteps)),
+beta=as.numeric(rep(splited[2],tsteps)),
+nd=as.numeric(rep(splited[3],tsteps)),
+distance=as.numeric(splited[4:(tsteps+3)]),
+entropy=as.numeric(splited[(tsteps+4):(2*tsteps+3)]),
+ng=as.numeric(rep(splited[2*tsteps+4],tsteps)),
+id=as.numeric(rep(splited[2*tsteps+5],tsteps)),
+moran=as.numeric(splited[(2*tsteps+6):(3*tsteps+5)]),
+pmax=as.numeric(rep(splited[3*tsteps+6],tsteps)),
+replication=as.numeric(rep(splited[3*tsteps+7],tsteps)),
+rsquared=as.numeric(splited[(3*tsteps+8):(4*tsteps+7)]),
+slope=as.numeric(splited[(4*tsteps+8):(5*tsteps+7)]),
+t=(0:(tsteps-1))*tstep
+)
+})
+sres=as.tbl(data.frame(alpha=unlist(res[seq(1,length(res),13)]),
+beta=unlist(res[seq(2,length(res),13)]),
+nd=unlist(res[seq(3,length(res),13)]),
+distance=unlist(res[seq(4,length(res),13)]),
+entropy=unlist(res[seq(5,length(res),13)]),
+ng=unlist(res[seq(6,length(res),13)]),
+id=unlist(res[seq(7,length(res),13)]),
+moran=unlist(res[seq(8,length(res),13)]),
+pmax=unlist(res[seq(9,length(res),13)]),
+replication=unlist(res[seq(10,length(res),13)]),
+rsquared=unlist(res[seq(11,length(res),13)]),
+slope=unlist(res[seq(12,length(res),13)]),
+t=unlist(res[seq(13,length(res),13)])
+))
+save(sres,file=paste0('exploration/',experiment,'.RData'))
+id=unique(sres$id)[1]
+rm(res);gc()
+id
+id
+replications=unique(sres$replication)[1:10]
+replications
+d=sres[sres$id==id,]
+d=d[d$replication%in%replications]
+d=d[d$replication%in%replications,]
+d
+g=ggplot(d,aes(x=moran,y=entropy,color=replication,group=replication))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+id=unique(sres$id)[1:5]
+replications=unique(sres$replication)[1:10]
+d=sres[sres$id%in%id,]
+d=d[d$replication%in%replications,]
+g=ggplot(d,aes(x=moran,y=entropy,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+d
+id
+d=sres[sres$id%in%id,]
+d=d[d$replication%in%replications,]
+d=sres[sres$id%in%id,]
+replications=unique(d$replication)[1:10]
+replications
+d=d[d$replication%in%replications,]
+d
+d=sres[sres$id%in%id,]
+g=ggplot(d,aes(x=moran,y=entropy,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+ampl = sres%>%group_by(id,t)%>%summarize(dmoran=max(moran)-min(moran),dentropy=max(entropy)-min(entropy),dslope=max(slope)-min(slope),ddistance=max(distance)-min(distance))
+warnings()
+summary(ampl)
+ampl[ampl$dentropy==max(ampl$dentropy),]
+id=669
+replications=unique(sres$replication)
+d=sres[sres$id%in%id,]
+g=ggplot(d,aes(x=moran,y=distance,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+g=ggplot(d[sample.int(nrow(d)),],aes(x=moran,y=distance,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+sample.int(nrow(d))
+g=ggplot(d[sample.int(nrow(d),100),],aes(x=moran,y=distance,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+g=ggplot(d[d$replication%in%sample.int(d$replication,100),],aes(x=moran,y=distance,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+g=ggplot(d[d$replication%in%sample(d$replication,100),],aes(x=moran,y=distance,color=alpha,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+g=ggplot(d[d$replication%in%sample(d$replication,100),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow())
+g+geom_point(size=0.1)+geom_path(arrow=arrow(size=0.1))
+g=ggplot(d[d$replication%in%sample(d$replication,100),],aes(x=moran,y=distance,color=entropy,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(size=0.1))+stdtheme
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = 0.1))+stdtheme
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = '0.1'))+stdtheme
+help("arrow")
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.1,'cm')))+stdtheme
+g=ggplot(d[d$replication%in%sample(d$replication,100),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.1,'cm')))+stdtheme
+g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.1,'cm')))+stdtheme
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.05,'cm')))+stdtheme
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
+set.seed(sample.int)
+set.seed(sample.int(10000,1))
+g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
+set.seed(sample.int(10000,1))
+g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
+s=sample.int(10000,1);show(s)
+set.seed(s)
+g=ggplot(d[d$replication%in%sample(d$replication,50),],aes(x=moran,y=distance,color=slope,group=interaction(replication,id)))
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+stdtheme
+names(d)
+d$ng
+d$ng[1]/d$pmax[1]
+g+geom_point(size=0.1)+geom_path(arrow=arrow(length = unit(0.08,'cm')))+
+ggtitle(bquote(N[G]/P[tot]*"="*.(round(d$ng[1]/d$pmax[1],digits=5))*" ; "*alpha*"="*.(round(d$alpha[1],digits=2))*" ; "*beta*"="*.(round(d$beta[1],digits=2))*" ; "*n[d]*"="*.(round(d$nd[1]))))+
+stdtheme
+ggsave(file=paste0(resdir,'trajs_moran-dist_seed',s,'.png'),width=22,height=20,units='cm')
+load(paste0(resdir,'lyapounov_',experiment,'.RData'))
+summary(breaks)
+experiment='20190112_1620_LOCAL'
+resdir=paste0(Sys.getenv('CS_HOME'),'/SpatialComplexity/Results/ReactionDiffusion/',experiment,'/');dir.create(resdir)
+load(paste0(resdir,'lyapounov_',experiment,'.RData'))
+summary(breaks)
